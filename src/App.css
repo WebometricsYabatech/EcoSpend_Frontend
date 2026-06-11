@@ -1,0 +1,38 @@
+.login-btn {
+    text-decoration: none;
+    color: #404940;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .login-btn:hover {
+    background-color: #b4f5cc;
+    
+  }
+  
+  .signup-btn {
+    text-decoration: none;
+    color: white;
+    background-color: #004c22;
+    padding: 8px 24px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .signup-btn:hover {
+    background-color: #006b31;
+    transform: translateY(-2px);
+  }
+  .login-btn:active,
+.signup-btn:active {
+  transform: scale(0.97);
+}
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+  * {
+    box-sizing: border-box;
+  }
