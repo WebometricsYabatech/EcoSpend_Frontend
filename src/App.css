@@ -36,3 +36,23 @@
   * {
     box-sizing: border-box;
   }
+  .Signup-Page{
+    display: flex;
+    min-height: 100vh;
+  }
+  .Signup-Page >*{
+    flex: 1;
+  }
+  .image-section img{
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+  }
+  @media (max-width: 768px) {
+    .Signup-Page{
+      flex-direction: column;
+    }
+    .image-section{
+      display: none;
+    }
+  }
