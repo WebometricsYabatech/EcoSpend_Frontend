@@ -2,6 +2,8 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import { Routes, Route } from "react-router-dom";
+import ForgotPassword from "./pages/ForgotPassword";
+import Welcome from "./pages/Welcome";
 
 export default function App(){
   return(
@@ -9,6 +11,8 @@ export default function App(){
   <Route path="/" element={<LandingPage />} />
   <Route path="/LoginPage" element={<LoginPage />} />
   <Route path="/SignupPage" element={<SignupPage />} />
+  <Route path="/ForgotPassword" element={<ForgotPassword/>}/>
+  <Route path="Welcome" element={<Welcome/>}/>
 </Routes>
   );
 }
