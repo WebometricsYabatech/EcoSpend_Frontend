@@ -9,12 +9,12 @@ export default function ForgotPasswordPage() {
     <div className="relative flex min-h-screen flex-col items-center justify-center bg-[#F7F9FB] px-6">
 
       {/* Background Blurs */}
-      <div className="absolute left-[-100px] top-[-100px] h-96 w-96 rounded-full bg-[#6BFF8F]/40 blur-[80px]" />
+      <div className="absolute left- [-100px] top- [-100px] h-96 w-96 rounded-full bg-[#6BFF8F]/40 blur-[80px]" />
 
-      <div className="absolute bottom-[-100px] right-[-100px] h-96 w-96 rounded-full bg-[#6BFF8F]/40 blur-[80px]" />
+      <div className="absolute bottom- [-100px] right- [-100px] h-96 w-96 rounded-full bg-[#6BFF8F]/40 blur-[80px]" />
 
       {/* Card */}
-      <div className="relative z-10 w-full max-w-[440px] rounded-xl bg-white p-12 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+      <div className="relative z-10 w-full max-w- [440px] rounded-xl bg-white p-12 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
 
         {/* Logo */}
         <div className="mb-8 flex flex-col items-center">

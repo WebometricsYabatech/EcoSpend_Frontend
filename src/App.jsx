@@ -4,6 +4,7 @@ import SignupPage from "./pages/SignupPage";
 import { Routes, Route } from "react-router-dom";
 import ForgotPassword from "./pages/ForgotPassword";
 import Welcome from "./pages/Welcome";
+import UploadReceipt from "./pages/UploadReceipt";
 
 export default function App(){
   return(
@@ -13,6 +14,7 @@ export default function App(){
   <Route path="/SignupPage" element={<SignupPage />} />
   <Route path="/ForgotPassword" element={<ForgotPassword/>}/>
   <Route path="Welcome" element={<Welcome/>}/>
+  <Route path= "UploadReceipt" element={<UploadReceipt/>}/>
 </Routes>
   );
 }

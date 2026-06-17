@@ -16,7 +16,7 @@ function LoginLHS() {
         <div className="absolute bottom-0 left-0 w-72 h-60 bg-[#A6F4B5] opacity-10" />
   
         {/* Content */}
-        <div className="relative z-10 max-w-[448px]">
+        <div className="relative z-10 max-w- [448px]">
   
           {/* Logo */}
           <div className="flex items-center gap-3 mb-8 ">
@@ -32,7 +32,7 @@ function LoginLHS() {
           </div>
   
           {/* Heading */}
-          <h2 className="text-[48px] font-bold leading-[60px] text-[#101110]">
+          <h2 className="text-[48px] font-bold leading- [60px] text-[#101110]">
             Track what you
             <br />
             spend. See what it

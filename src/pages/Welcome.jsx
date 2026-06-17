@@ -3,15 +3,17 @@ import "../App.css";
 import { Link } from "react-router-dom";
 import { FaLeaf, FaLock, FaArrowRight, FaReceipt } from "react-icons/fa";
 import ecoIcon from "../assets/eco-icon.svg";
+import aiIcon from "../assets/AI-iconGreen.svg";
+import { FaClock, FaClockRotateLeft } from "react-icons/fa6";
 
 export default function WelcomePage() {
   return (
     <div className="relative min-h-screen bg-[#F7F9FB] flex items-center justify-center px-4 py-10 overflow-hidden">
 
       {/* Background Blurs */}
-      <div className="absolute top-[-100px] right-[-100px] h-96 w-96 rounded-full bg-[#6BFF8F]/30 blur-[120px]" />
+      <div className="absolute top- [-100px] right- [-100px] h-96 w-96 rounded-full bg-[#6BFF8F]/30 blur-[120px]" />
 
-      <div className="absolute bottom-[-100px] left-[-100px] h-[500px] w-[500px] rounded-full bg-[#A6F4B5]/20 blur-[120px]" />
+      <div className="absolute bottom- [-100px] left- [-100px] h- [500px] w- [500px] rounded-full bg-[#A6F4B5]/20 blur-[120px]" />
 
       <div className="relative z-10 w-full max-w-3xl">
 
@@ -38,7 +40,7 @@ export default function WelcomePage() {
 
             <div className="absolute h-64 w-64 rounded-full bg-[#6BFF8F]/30 blur-[80px]" />
 
-            <div className="absolute h-32 w-32 rounded-full bg-[#A6F4B5]/40 blur-[40px]" />
+            <div className="absolute h-32 w-32 rounded-full bg-[#A6F4B5]/40 blur- [40px]" />
 
             <div className="relative z-10 rounded-xl bg-[#F7F9FB] p-8 shadow-lg">
               <FaReceipt
@@ -65,13 +67,14 @@ export default function WelcomePage() {
             <div className="mt-8 flex flex-wrap justify-center gap-4">
 
               <div className="flex items-center gap-2 rounded-full bg-[#6BFF8F]/30 px-4 py-2">
-                <FaLeaf className="text-[#006E2F]" />
+                <img src={aiIcon} className="text-[#006E2F]" />
                 <span className="text-s font-semibold text-[#005321]">
                   AI Carbon Tracking
                 </span>
               </div>
 
               <div className="flex items-center gap-2 rounded-full bg-[#D4E4FA]/30 px-4 py-2">
+                <FaClockRotateLeft className="text-[#39485A]"/>
                 <span className="text-s font-semibold text-[#39485A]">
                   &lt; 30 Seconds
                 </span>
@@ -85,6 +88,7 @@ export default function WelcomePage() {
         {/* CTA */}
         <div className="mt-8 space-y-4">
 
+          <Link to="/UploadReceipt">
           <button
             className="flex w-full items-center justify-center gap-1 rounded-lg bg-[#004C22] py-4 text-s font-semibold text-white transition hover:bg-[#006E2F]"
           >
@@ -92,6 +96,7 @@ export default function WelcomePage() {
             Upload your first receipt
             <FaArrowRight />
           </button>
+          </Link>
 
           <Link
             to="/dashboard"
