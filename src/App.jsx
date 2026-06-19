@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import ForgotPassword from "./pages/ForgotPassword";
 import Welcome from "./pages/Welcome";
 import UploadReceipt from "./pages/UploadReceipt";
+import ProcessingPage from "./pages/ProcessingPage";
 
 export default function App(){
   return(
@@ -15,6 +16,7 @@ export default function App(){
   <Route path="/ForgotPassword" element={<ForgotPassword/>}/>
   <Route path="Welcome" element={<Welcome/>}/>
   <Route path= "UploadReceipt" element={<UploadReceipt/>}/>
+  <Route path= "ProcessingPage" element={<ProcessingPage/>}/>
 </Routes>
   );
 }

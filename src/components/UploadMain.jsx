@@ -30,7 +30,7 @@ export default function UploadReceipt() {
 
     // Later you'll send the file to your backend here
 
-    navigate("/processing");
+    navigate("/ProcessingPage");
   };
 
   return (
