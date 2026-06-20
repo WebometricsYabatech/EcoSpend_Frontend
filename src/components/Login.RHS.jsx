@@ -1,16 +1,23 @@
 import React from "react";
 import '../App.css';
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaEye, FaEyeSlash, FaGoogle } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import google from "../assets/google.svg";
 
 export default function LoginRHS() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // TODO: add your actual auth logic here
+    navigate("/Welcome");
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-10 py-10">
-      <div className="w-full max-w- [400px]">
+      <div className="w-full max-w-[400px]">
 
         {/* Header */}
         <div className="mb-8">
@@ -24,7 +31,7 @@ export default function LoginRHS() {
         </div>
 
         {/* Form */}
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
 
           {/* Email */}
           <div>
@@ -40,6 +47,7 @@ export default function LoginRHS() {
               type="email"
               placeholder="name@company.com"
               autoComplete="email"
+              required
               className="w-full rounded-lg border border-[#BFC9BD] px-4 py-3 text-[#191C1E] outline-none transition focus:border-[#006E2F] focus:ring-2 focus:ring-[#006E2F]"
             />
           </div>
@@ -68,6 +76,7 @@ export default function LoginRHS() {
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 autoComplete="current-password"
+                required
                 className="w-full rounded-lg border border-[#BFC9BD] px-4 py-3 pr-12 text-[#191C1E] outline-none transition focus:border-[#006E2F] focus:ring-2 focus:ring-[#006E2F]"
               />
 
@@ -98,28 +107,24 @@ export default function LoginRHS() {
           </div>
 
           {/* Login Button */}
-          <Link
-          to="/Welcome">
           <button
-          
             type="submit"
             className="w-full rounded-lg bg-[#004C22] py-3 font-semibold text-white transition hover:bg-[#006E2F]"
           >
             Log in
           </button>
-          </Link>
 
           {/* Social buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            type="button"
-            className="flex-1 flex items-center justify-center gap-2 py-2 border border-[#BFC9BD] rounded-lg text-[#191C1E] font-['Inter'] hover:bg-white transition"
-          >
-            <img src={google} alt="Google" className="w-5 h-5" />
-            Sign in with Google
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              className="flex-1 flex items-center justify-center gap-2 py-2 border border-[#BFC9BD] rounded-lg text-[#191C1E] font-['Inter'] hover:bg-white transition"
+            >
+              <img src={google} alt="Google" className="w-5 h-5" />
+              Sign in with Google
+            </button>
+          </div>
 
-        </div>
         </form>
 
         {/* Signup Link */}

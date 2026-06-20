@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaEye } from "react-icons/fa";
-import { FaEyeSlash } from "react-icons/fa";
-import { FaArrowRight } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash, FaArrowRight } from "react-icons/fa";
 import google from "../assets/google.svg";
 import ecoIcon from "../assets/eco-icon.svg";
-
+import { signupUser } from "../api";
 
 export default function SignupRHS() {
   const [formData, setFormData] = useState({
@@ -17,9 +15,13 @@ export default function SignupRHS() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError("");
   };
 
   // ---- PASSWORD STRENGTH LOGIC ----
@@ -33,13 +35,9 @@ export default function SignupRHS() {
     if (/[0-9]/.test(password)) score++;
     if (/[^A-Za-z0-9]/.test(password)) score++;
 
-    if (score <= 2) {
-      return { label: "Weak", percent: 33, color: "#F59E0B" };
-    } else if (score <= 4) {
-      return { label: "Medium", percent: 66, color: "#3B82F6" };
-    } else {
-      return { label: "Strong", percent: 100, color: "#16A34A" };
-    }
+    if (score <= 2) return { label: "Weak", percent: 33, color: "#F59E0B" };
+    if (score <= 4) return { label: "Medium", percent: 66, color: "#3B82F6" };
+    return { label: "Strong", percent: 100, color: "#16A34A" };
   };
 
   const strength = getPasswordStrength(formData.password);
@@ -52,30 +50,40 @@ export default function SignupRHS() {
     formData.confirmPassword.length > 0 &&
     formData.password !== formData.confirmPassword;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
 
     if (strength.label === "Weak") {
-      alert("Please choose a stronger password.");
+      setError("Please choose a stronger password.");
       return;
     }
 
-    // TODO: connect to backend signup endpoint
-    console.log("Signup data:", formData);
+    setLoading(true);
+
+    try {
+      await signupUser(formData.fullName, formData.email, formData.password);
+      navigate("/LoginPage");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="w-full lg:w-1/2 min-h-screen flex flex-col justify-center items-center bg-[#F7F9FB] px-6 py-12">
       <div className="w-full max-w-md flex flex-col gap-8 pb-4">
+
         {/* Logo + Heading */}
         <div className="flex flex-col">
           <div className="flex items-center gap-2 pb-2">
-            <img src={ecoIcon}/>
+            <img src={ecoIcon} />
             <h1 className="text-2xl font-bold text-[#004C22] font-['inter']">
               EcoSpend
             </h1>
@@ -92,6 +100,7 @@ export default function SignupRHS() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+
           {/* Full Name */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-semibold text-[#404940] font-['Inter']">
@@ -148,7 +157,7 @@ export default function SignupRHS() {
               </button>
             </div>
 
-            {/* Strength meter - only show once user starts typing */}
+            {/* Strength meter */}
             {formData.password && (
               <div className="flex flex-col gap-1 mt-1">
                 <div className="flex justify-between text-xs font-['Inter']">
@@ -189,7 +198,7 @@ export default function SignupRHS() {
             )}
           </div>
 
-          {/* Confirm Password */}
+         {/* Confirm Password */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-semibold text-[#404940] font-['Inter']">
               Confirm password
@@ -230,14 +239,21 @@ export default function SignupRHS() {
             )}
           </div>
 
+          {/* Global error from backend */}
+          {error && (
+            <p className="text-sm text-red-500 font-['Inter']">{error}</p>
+          )}
+
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-4 bg-[#004C22] rounded-lg shadow-sm flex items-center justify-center gap-2 text-white text-base font-['Inter'] transition hover:bg-[#006E2F]"
+            disabled={loading}
+            className="w-full py-4 bg-[#004C22] rounded-lg shadow-sm flex items-center justify-center gap-2 text-white text-base font-['Inter'] transition hover:bg-[#006E2F] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Create account
-            <FaArrowRight size={16} />
+            {loading ? "Creating account..." : "Create account"}
+            {!loading && <FaArrowRight size={16} />}
           </button>
+
         </form>
 
         {/* Divider */}
@@ -257,7 +273,6 @@ export default function SignupRHS() {
             <img src={google} alt="Google" className="w-5 h-5" />
             Google
           </button>
-
         </div>
 
         {/* Login link */}
@@ -267,9 +282,8 @@ export default function SignupRHS() {
             Log in
           </Link>
         </p>
-      </div>
 
-      
+      </div>
     </div>
   );
 }

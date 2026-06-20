@@ -2,7 +2,7 @@ import React from "react";
 import "../App.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaRobot } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import aiIcon from "../assets/AI-icon.svg";
 
 export default function UploadReceipt() {
@@ -11,7 +11,6 @@ export default function UploadReceipt() {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-
     if (!selectedFile) return;
 
     if (selectedFile.size > 10 * 1024 * 1024) {
@@ -28,9 +27,8 @@ export default function UploadReceipt() {
       return;
     }
 
-    // Later you'll send the file to your backend here
-
-    navigate("/ProcessingPage");
+    // Pass the file to ProcessingPage via location.state
+    navigate("/ProcessingPage", { state: { file } });
   };
 
   return (
@@ -42,7 +40,6 @@ export default function UploadReceipt() {
           <h1 className="font-['inter'] text-3xl font-bold text-[#004C22]">
             Add New Receipt
           </h1>
-
           <p className="mt-2 text-base text-[#404940]">
             Upload your paper or digital receipt to track your eco-impact.
           </p>
@@ -54,10 +51,7 @@ export default function UploadReceipt() {
           className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#004C22]/30 bg-[#F7F9FB] px-8 py-14 transition hover:border-[#004C22] hover:bg-[#f0f7f2]"
         >
           <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#6BFF8F]">
-            <FaPlus
-              size={34}
-              className="text-[#004C22]"
-            />
+            <FaPlus size={34} className="text-[#004C22]" />
           </div>
 
           <h2 className="font-['Inter'] text-xl font-semibold text-[#004C22]">
@@ -70,9 +64,7 @@ export default function UploadReceipt() {
 
           {file && (
             <div className="mt-6 rounded-lg bg-white px-4 py-2 shadow-sm">
-              <p className="text-sm font-medium text-[#004C22]">
-                {file.name}
-              </p>
+              <p className="text-sm font-medium text-[#004C22]">{file.name}</p>
             </div>
           )}
 
@@ -93,13 +85,14 @@ export default function UploadReceipt() {
             className={`flex items-center gap-3 rounded-lg px-8 py-5 font-semibold text-white transition ${
               file
                 ? "bg-[#004C22] hover:bg-[#006E2F]"
-                : "cursor-not-allowed bg-[#006E2F]"
+                : "cursor-not-allowed bg-[#006E2F] opacity-60"
             }`}
           >
-            <img src={aiIcon}/>
+            <img src={aiIcon} />
             Process Receipt with AI
           </button>
         </div>
+
       </div>
     </div>
   );

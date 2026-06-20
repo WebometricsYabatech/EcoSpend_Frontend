@@ -6,6 +6,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Welcome from "./pages/Welcome";
 import UploadReceipt from "./pages/UploadReceipt";
 import ProcessingPage from "./pages/ProcessingPage";
+import ReviewPage from "./pages/RewiewPage";
 
 export default function App(){
   return(
@@ -17,6 +18,7 @@ export default function App(){
   <Route path="Welcome" element={<Welcome/>}/>
   <Route path= "UploadReceipt" element={<UploadReceipt/>}/>
   <Route path= "ProcessingPage" element={<ProcessingPage/>}/>
+  <Route path="ReviewPage" element={<ReviewPage/>}/>
 </Routes>
   );
 }
