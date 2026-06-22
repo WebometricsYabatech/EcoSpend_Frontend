@@ -11,7 +11,7 @@ import dashboard from "../assets/dashboardicon.svg";
 import profileIcon from "../assets/profileIcon.svg";
 import settingsIcon from "../assets/settings.svg";
 import uploadIcon from "../assets/uploadIcon.svg";
-export default function Sidebar() {
+export default function NavBar() {
   const navItems = [
     {
       name: "Dashboard",
@@ -25,7 +25,7 @@ export default function Sidebar() {
     },
     {
       name: "Receipt History",
-      path: "/history",
+      path: "/ReceiptHistory",
       icon: <FaHistory />,
     },
     {

@@ -7,6 +7,9 @@ import Welcome from "./pages/Welcome";
 import UploadReceipt from "./pages/UploadReceipt";
 import ProcessingPage from "./pages/ProcessingPage";
 import ReviewPage from "./pages/RewiewPage";
+import ReviewDetails from "./pages/ReviewDetails";
+import ReceiptHistory from "./pages/ReceiptHistory";
+import Dashboard from "./pages/Dashboard";
 
 export default function App(){
   return(
@@ -19,6 +22,9 @@ export default function App(){
   <Route path= "UploadReceipt" element={<UploadReceipt/>}/>
   <Route path= "ProcessingPage" element={<ProcessingPage/>}/>
   <Route path="ReviewPage" element={<ReviewPage/>}/>
+  <Route path="ReviewDetails" element={<ReviewDetails/>}/>
+  <Route path="ReceiptHistory" element={<ReceiptHistory/>}/>
+  <Route path="Dashboard" element={<Dashboard/>}/>
 </Routes>
   );
 }

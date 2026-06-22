@@ -50,7 +50,7 @@ export default function ReviewReceipt() {
 
   const handleConfirm = () => {
     console.log("Confirmed receipt:", { store, date, total, items });
-    navigate("/Dashboard");
+    navigate("/ReviewDetails");
   };
 
   const handleCancel = () => {

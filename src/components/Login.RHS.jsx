@@ -17,7 +17,7 @@ export default function LoginRHS() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-10 py-10">
-      <div className="w-full max-w-[400px]">
+      <div className="w-full max -w-[400px]">
 
         {/* Header */}
         <div className="mb-8">
