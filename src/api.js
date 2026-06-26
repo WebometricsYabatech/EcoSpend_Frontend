@@ -1,4 +1,4 @@
-const BASE_URL ="https://eco-spend-backend.vercel.app";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export async function loginUser(email, password) {
   const response = await fetch(`${BASE_URL}/api/auth/login`, {
@@ -17,6 +17,8 @@ export async function loginUser(email, password) {
 }
 
 export async function signupUser(fullname, email, password) {
+  console.log("BASE_URL:", BASE_URL);
+  console.log("Fetching:", `${BASE_URL}/api/auth/register`);
   const response = await fetch(`${BASE_URL}/api/auth/register`, {
     method: "POST",
     headers: { 
