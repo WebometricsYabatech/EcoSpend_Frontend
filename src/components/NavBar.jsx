@@ -30,12 +30,12 @@ export default function NavBar() {
     },
     {
       name: "Profile",
-      path: "/profile",
+      path: "/ProfileAndSettings",
       icon: <img src={profileIcon} />,
     },
     {
       name: "Settings",
-      path: "/settings",
+      path: "/ProfileAndSettings",
       icon: <img src={settingsIcon}/>,
     },
   ];

@@ -1,4 +1,4 @@
-const BASE_URL = "https://slighting-suitcase-wooing.ngrok-free.dev";
+const BASE_URL ="https://eco-spend-backend.vercel.app";
 
 export async function loginUser(email, password) {
   const response = await fetch(`${BASE_URL}/api/auth/login`, {
@@ -16,13 +16,12 @@ export async function loginUser(email, password) {
   return data;
 }
 
-export async function signupUser(name, email, password) {
+export async function signupUser(fullName, email, password) {
   const response = await fetch(`${BASE_URL}/api/auth/register`, {
     method: "POST",
     headers: { 
-        "Content-Type": "application/json" ,
-    'ngrok-skip-browser-warning': 'true'},
-    body: JSON.stringify({ name, email, password }),
+        "Content-Type": "application/json"},
+    body: JSON.stringify({ fullName, email, password }),
   });
 
   const data = await response.json();

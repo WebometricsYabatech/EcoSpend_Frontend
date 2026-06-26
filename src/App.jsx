@@ -10,6 +10,7 @@ import ReviewPage from "./pages/RewiewPage";
 import ReviewDetails from "./pages/ReviewDetails";
 import ReceiptHistory from "./pages/ReceiptHistory";
 import Dashboard from "./pages/Dashboard";
+import ProfileAndSettings from "./pages/ProfileAndSettings";
 
 export default function App(){
   return(
@@ -25,6 +26,7 @@ export default function App(){
   <Route path="ReviewDetails" element={<ReviewDetails/>}/>
   <Route path="ReceiptHistory" element={<ReceiptHistory/>}/>
   <Route path="Dashboard" element={<Dashboard/>}/>
+  <Route path="ProfileAndSettings" element={<ProfileAndSettings/>}/>
 </Routes>
   );
 }
