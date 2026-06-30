@@ -4,27 +4,41 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import google from "../assets/google.svg";
+import { loginUser } from "../api";
 
 export default function LoginRHS() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: add your actual auth logic here
-    navigate("/Welcome");
+    setError("");
+    setLoading(true);
+
+    try {
+      const data = await loginUser(email, password);
+      if (data.token) localStorage.setItem("token", data.token);
+      navigate("/Welcome");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-10 py-10">
-      <div className="w-full max -w-[400px]">
+      <div className="w-full max-w-[400px]">
 
         {/* Header */}
         <div className="mb-8">
           <h1 className="font-['inter'] text-[32px] font-bold leading-10 text-[#191C1E]">
             Welcome back
           </h1>
-
           <p className="mt-1 text-base text-[#404940]">
             Please enter your details to sign in.
           </p>
@@ -41,14 +55,22 @@ export default function LoginRHS() {
             >
               Email address
             </label>
-
             <input
               id="email"
               type="email"
               placeholder="name@company.com"
               autoComplete="email"
               required
-              className="w-full rounded-lg border border-[#BFC9BD] px-4 py-3 text-[#191C1E] outline-none transition focus:border-[#006E2F] focus:ring-2 focus:ring-[#006E2F]"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError("");
+              }}
+              className={`w-full rounded-lg border px-4 py-3 text-[#191C1E] outline-none transition focus:ring-2 ${
+                error
+                  ? "border-red-400 focus:border-red-400 focus:ring-red-200"
+                  : "border-[#BFC9BD] focus:border-[#006E2F] focus:ring-[#006E2F]"
+              }`}
             />
           </div>
 
@@ -61,7 +83,6 @@ export default function LoginRHS() {
               >
                 Password
               </label>
-
               <Link
                 to="/ForgotPassword"
                 className="text-sm font-semibold text-[#006E2F] hover:underline"
@@ -77,9 +98,17 @@ export default function LoginRHS() {
                 placeholder="••••••••"
                 autoComplete="current-password"
                 required
-                className="w-full rounded-lg border border-[#BFC9BD] px-4 py-3 pr-12 text-[#191C1E] outline-none transition focus:border-[#006E2F] focus:ring-2 focus:ring-[#006E2F]"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setError("");
+                }}
+                className={`w-full rounded-lg border px-4 py-3 pr-12 text-[#191C1E] outline-none transition focus:ring-2 ${
+                  error
+                    ? "border-red-400 focus:border-red-400 focus:ring-red-200"
+                    : "border-[#BFC9BD] focus:border-[#006E2F] focus:ring-[#006E2F]"
+                }`}
               />
-
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -88,6 +117,11 @@ export default function LoginRHS() {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
+
+            {/* Error message */}
+            {error && (
+              <p className="mt-2 text-sm text-red-500">{error}</p>
+            )}
           </div>
 
           {/* Remember Me */}
@@ -97,11 +131,7 @@ export default function LoginRHS() {
               type="checkbox"
               className="h-4 w-4 rounded border-[#BFC9BD]"
             />
-
-            <label
-              htmlFor="remember"
-              className="text-sm text-[#404940]"
-            >
+            <label htmlFor="remember" className="text-sm text-[#404940]">
               Remember for 30 days
             </label>
           </div>
@@ -109,9 +139,10 @@ export default function LoginRHS() {
           {/* Login Button */}
           <button
             type="submit"
-            className="w-full rounded-lg bg-[#004C22] py-3 font-semibold text-white transition hover:bg-[#006E2F]"
+            disabled={loading}
+            className="w-full rounded-lg bg-[#004C22] py-3 font-semibold text-white transition hover:bg-[#006E2F] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Log in
+            {loading ? "Signing in..." : "Log in"}
           </button>
 
           {/* Social buttons */}
@@ -130,10 +161,7 @@ export default function LoginRHS() {
         {/* Signup Link */}
         <p className="mt-8 text-center text-sm text-[#404940]">
           Don't have an account?
-          <Link
-            to="/SignupPage"
-            className="ml-1 text-[#006E2F] hover:underline"
-          >
+          <Link to="/SignupPage" className="ml-1 text-[#006E2F] hover:underline">
             Sign up
           </Link>
         </p>
@@ -141,14 +169,8 @@ export default function LoginRHS() {
         {/* Footer */}
         <div className="mt-12 flex justify-center gap-6 text-xs font-medium text-[#707A6F]">
           <span>© 2026 EcoSpend Inc.</span>
-
-          <Link to="/privacy" className="hover:underline">
-            Privacy Policy
-          </Link>
-
-          <Link to="/terms" className="hover:underline">
-            Terms of Service
-          </Link>
+          <Link to="/privacy" className="hover:underline">Privacy Policy</Link>
+          <Link to="/terms" className="hover:underline">Terms of Service</Link>
         </div>
 
       </div>
