@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import AIicon from "../assets/AI-iconGreen.svg";
-
+import { confirmReceipt } from "../api";
 const CATEGORY_OPTIONS = [
   "Groceries",
   "Food & Dining",
@@ -37,6 +37,8 @@ export default function ReviewReceipt() {
   const [date, setDate] = useState(scannedData.date);
   const [total, setTotal] = useState(scannedData.total);
   const [items, setItems] = useState(scannedData.items);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const handleItemChange = (index, field, value) => {
     const updated = [...items];
@@ -48,9 +50,33 @@ export default function ReviewReceipt() {
     setItems([...items, { ...EMPTY_ITEM }]);
   };
 
-  const handleConfirm = () => {
-    console.log("Confirmed receipt:", { store, date, total, items });
-    navigate("/ReviewDetails");
+  const handleConfirm = async () => {
+    setIsSaving(true);
+    setError("");
+  
+    try {
+      const receiptData = {
+        store,
+        date,
+        total,
+        items,
+      };
+  
+      const response = await confirmReceipt(receiptData);
+  
+      console.log("Receipt confirmed:", response);
+  
+      navigate("/ReviewDetails", {
+        state: {
+          receiptData: response,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to confirm receipt.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {

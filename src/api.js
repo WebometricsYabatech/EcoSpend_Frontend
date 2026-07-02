@@ -34,3 +34,47 @@ export async function signupUser(fullname, email, password) {
 
   return data;
 }
+export async function scanReceipt(file) {
+  const formData = new FormData();
+  formData.append("receipt", file);
+
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${BASE_URL}/api/ai/scan-receipt`, {
+    method: "POST",
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+      // Don't set Content-Type — browser sets it automatically with boundary for FormData
+    },
+    body: formData,
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to scan receipt. Please try again.");
+  }
+
+  return data;
+}
+
+export async function confirmReceipt(receiptData) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${BASE_URL}/api/ai/confirm-receipt`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(receiptData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to confirm receipt. Please try again.");
+  }
+
+  return data;
+}
