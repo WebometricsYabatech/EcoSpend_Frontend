@@ -1,65 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import NavBar from "../components/NavBar";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars } from "react-icons/fa";
 
 export default function AppLayout() {
   const [navOpen, setNavOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
 
-      {/* Mobile overlay */}
-      {navOpen && (
-        <div
-          onClick={() => setNavOpen(false)}
-          style={{
-            position: "fixed", inset: 0,
-            background: "rgba(0,0,0,0.4)",
-            zIndex: 40,
-          }}
-        />
+      {/* Desktop sidebar — static, always visible on desktop */}
+      {isDesktop && (
+        <aside style={{
+          width: 256,
+          flexShrink: 0,
+          minHeight: "100vh",
+          background: "#F2F4F6",
+          borderRight: "1px solid #BFC9BD",
+          padding: 16,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          boxSizing: "border-box",
+        }}>
+          <NavBar navOpen={true} onClose={() => {}} />
+        </aside>
       )}
 
-      {/* Sidebar — hidden on mobile, slides in when open */}
-      <div style={{
-        position: "fixed", top: 0, left: 0,
-        height: "100vh", zIndex: 50,
-        transform: navOpen ? "translateX(0)" : "translateX(-100%)",
-        transition: "transform 0.3s ease",
-      }}
-        className="lg:static lg:translate-x-0 lg:transition-none"
-      >
-        <NavBar onClose={() => setNavOpen(false)} />
-      </div>
+      {/* Mobile sliding sidebar */}
+      {!isDesktop && (
+        <NavBar navOpen={navOpen} onClose={() => setNavOpen(false)} />
+      )}
 
       {/* Main content */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
 
         {/* Mobile top bar */}
-        <div
-          className="lg:hidden"
-          style={{
-            display: "flex", alignItems: "center",
+        {!isDesktop && (
+          <div style={{
+            display: "flex",
+            alignItems: "center",
             justifyContent: "space-between",
             padding: "12px 16px",
             background: "#F2F4F6",
             borderBottom: "1px solid #BFC9BD",
-            position: "sticky", top: 0, zIndex: 30,
-          }}
-        >
-          <h1 style={{ fontFamily: "Inter", fontSize: 18, fontWeight: 700, color: "#004C22", margin: 0 }}>
-            EcoSpend
-          </h1>
-          <button
-            onClick={() => setNavOpen(true)}
-            style={{ background: "none", border: "none", cursor: "pointer" }}
-          >
-            <FaBars size={20} color="#004C22" />
-          </button>
-        </div>
+            position: "sticky",
+            top: 0,
+            zIndex: 100,
+          }}>
+            <h1 style={{
+              fontFamily: "Inter", fontSize: 18,
+              fontWeight: 700, color: "#004C22", margin: 0,
+            }}>
+              EcoSpend
+            </h1>
+            <button
+              onClick={() => setNavOpen(true)}
+              style={{
+                background: "none", border: "none",
+                cursor: "pointer", padding: 8,
+                display: "flex", alignItems: "center",
+              }}
+            >
+              <FaBars size={22} color="#004C22" />
+            </button>
+          </div>
+        )}
 
-        {/* Page content */}
         <main style={{ flex: 1 }}>
           <Outlet />
         </main>

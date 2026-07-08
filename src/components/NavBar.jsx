@@ -1,13 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../App.css";
 import { NavLink, useNavigate } from "react-router-dom";
-import {
-  FaCog,
-  FaHistory,
-  FaFileUpload,
-  FaUserEdit,
-  FaSignOutAlt,
-} from "react-icons/fa";
+import { FaHistory, FaSignOutAlt, FaTimes, FaBars } from "react-icons/fa";
 import dashboard from "../assets/dashboardicon.svg";
 import profileIcon from "../assets/profileIcon.svg";
 import settingsIcon from "../assets/settings.svg";
@@ -15,33 +9,24 @@ import uploadIcon from "../assets/uploadIcon.svg";
 
 export default function NavBar() {
   const navigate = useNavigate();
+  const [navOpen, setNavOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+      if (window.innerWidth >= 1024) setNavOpen(false);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const navItems = [
-    {
-      name: "Dashboard",
-      path: "/dashboard",
-      icon: <img src={dashboard}/>,
-    },
-    {
-      name: "Upload Receipt",
-      path: "/UploadReceipt",
-      icon: <img src={uploadIcon}/>,
-    },
-    {
-      name: "Receipt History",
-      path: "/ReceiptHistory",
-      icon: <FaHistory />,
-    },
-    {
-      name: "Profile",
-      path: "/ProfileAndSettings",
-      icon: <img src={profileIcon} />,
-    },
-    {
-      name: "Settings",
-      path: "/ProfileAndSettings",
-      icon: <img src={settingsIcon}/>,
-    },
+    { name: "Dashboard", path: "/dashboard", icon: <img src={dashboard} alt="dashboard" style={{ width: 18, height: 18 }} /> },
+    { name: "Upload Receipt", path: "/UploadReceipt", icon: <img src={uploadIcon} alt="upload" style={{ width: 18, height: 18 }} /> },
+    { name: "Receipt History", path: "/ReceiptHistory", icon: <FaHistory /> },
+    { name: "Profile", path: "/ProfileAndSettings", icon: <img src={profileIcon} alt="profile" style={{ width: 18, height: 18 }} /> },
+    { name: "Settings", path: "/ProfileAndSettings", icon: <img src={settingsIcon} alt="settings" style={{ width: 18, height: 18 }} /> },
   ];
 
   const handleLogout = () => {
@@ -49,35 +34,51 @@ export default function NavBar() {
     navigate("/LoginPage");
   };
 
-  return (
-    <aside className="w-64 min-h-screen bg-[#F2F4F6] border-r border-[#BFC9BD] p-4 flex flex-col justify-between">
+  const sidebarContent = (
+    <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
       <div>
-        {/* Logo Section */}
-        <div className="pb-6">
-          <h1 className="font-['inter'] text-xl font-bold text-[#004C22]">
-            EcoSpend
-          </h1>
-
-          <p className="mt-1 text-xs font-medium text-[#404940]/70">
-            Sustainable Finance
-          </p>
+        {/* Logo + close button */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 24 }}>
+          <div>
+            <h1 style={{ fontFamily: "Inter", fontSize: 20, fontWeight: 700, color: "#004C22", margin: 0 }}>
+              EcoSpend
+            </h1>
+            <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(64,73,64,0.7)" }}>
+              Sustainable Finance
+            </p>
+          </div>
+          {/* Only show close button on mobile */}
+          {!isDesktop && (
+            <button
+              onClick={() => setNavOpen(false)}
+              style={{ background: "none", border: "none", cursor: "pointer" }}
+            >
+              <FaTimes size={18} color="#404940" />
+            </button>
+          )}
         </div>
 
-        {/* Navigation */}
-        <nav className="space-y-1">
+        {/* Nav items */}
+        <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           {navItems.map((item) => (
             <NavLink
               key={item.name}
               to={item.path}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold transition-all ${
-                  isActive
-                    ? "bg-[#6BFF8F] text-[#007432]"
-                    : "text-[#404940] hover:bg-[#6BFF8F]"
-                }`
-              }
+              onClick={() => !isDesktop && setNavOpen(false)}
+              style={({ isActive }) => ({
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "10px 16px",
+                borderRadius: 8,
+                textDecoration: "none",
+                fontSize: 14,
+                fontWeight: 600,
+                background: isActive ? "#6BFF8F" : "transparent",
+                color: isActive ? "#007432" : "#404940",
+              })}
             >
-              <span className="text-lg">{item.icon}</span>
+              <span style={{ fontSize: 18, display: "flex" }}>{item.icon}</span>
               <span>{item.name}</span>
             </NavLink>
           ))}
@@ -87,13 +88,93 @@ export default function NavBar() {
       {/* Logout */}
       <button
         onClick={handleLogout}
-        className="flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold text-[#BA1A1A] hover:bg-[#FFDAD6] transition-all"
+        style={{
+          display: "flex", alignItems: "center", gap: 12,
+          padding: "10px 16px", borderRadius: 8,
+          border: "none", background: "none",
+          fontSize: 14, fontWeight: 600,
+          color: "#BA1A1A", cursor: "pointer",
+        }}
       >
-        <span className="text-lg">
-          <FaSignOutAlt />
-        </span>
+        <FaSignOutAlt />
         <span>Log out</span>
       </button>
-    </aside>
+    </div>
+  );
+
+  // ── DESKTOP: static sidebar ──
+  if (isDesktop) {
+    return (
+      <aside style={{
+        width: 256,
+        minHeight: "100vh",
+        flexShrink: 0,
+        background: "#F2F4F6",
+        borderRight: "1px solid #BFC9BD",
+        padding: 16,
+        boxSizing: "border-box",
+      }}>
+        {sidebarContent}
+      </aside>
+    );
+  }
+
+  // ── MOBILE: hamburger + sliding drawer ──
+  return (
+    <>
+      {/* Top bar with hamburger */}
+      <div style={{
+        position: "fixed",
+        top: 0, left: 0, right: 0,
+        height: 56,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "0 16px",
+        background: "#F2F4F6",
+        borderBottom: "1px solid #BFC9BD",
+        zIndex: 1000,
+        boxSizing: "border-box",
+      }}>
+        <h1 style={{ fontFamily: "Inter", fontSize: 18, fontWeight: 700, color: "#004C22", margin: 0 }}>
+          EcoSpend
+        </h1>
+        <button
+          onClick={() => setNavOpen(true)}
+          style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex" }}
+        >
+          <FaBars size={22} color="#004C22" />
+        </button>
+      </div>
+
+      {/* Overlay */}
+      {navOpen && (
+        <div
+          onClick={() => setNavOpen(false)}
+          style={{
+            position: "fixed", inset: 0,
+            background: "rgba(0,0,0,0.4)",
+            zIndex: 1001,
+          }}
+        />
+      )}
+
+      {/* Sliding drawer */}
+      <aside style={{
+        position: "fixed",
+        top: 0,
+        left: navOpen ? 0 : "-260px",
+        height: "100vh",
+        width: 256,
+        background: "#F2F4F6",
+        borderRight: "1px solid #BFC9BD",
+        padding: 16,
+        zIndex: 1002,
+        transition: "left 0.3s ease",
+        boxSizing: "border-box",
+      }}>
+        {sidebarContent}
+      </aside>
+    </>
   );
 }
