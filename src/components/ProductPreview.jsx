@@ -1,6 +1,6 @@
 import React from "react";
 import '../App.css';
-import EcoDashboard from "../assets/EcoSpend-Dashboard-preview.png";
+import EcoDashboard from "../assets/EcoSpend-Dashboard-Preview.png";
 import { FaCheckCircle } from "react-icons/fa";
 
 export default function ProductPreview() {

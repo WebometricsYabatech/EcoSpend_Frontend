@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../App.css";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaHistory, FaSignOutAlt, FaTimes, FaBars } from "react-icons/fa";
-import dashboard from "../assets/dashboardicon.svg";
+import dashboard from "../assets/dashboardIcon.svg";
 import profileIcon from "../assets/profileIcon.svg";
 import settingsIcon from "../assets/settings.svg";
 import uploadIcon from "../assets/uploadIcon.svg";
