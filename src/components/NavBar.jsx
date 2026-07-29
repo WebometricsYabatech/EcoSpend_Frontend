@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaHistory, FaSignOutAlt, FaTimes, FaBars } from "react-icons/fa";
+import { FaHistory, FaSignOutAlt, FaTimes, FaBars, FaUser } from "react-icons/fa";
 import dashboard from "../assets/dashboardIcon.svg";
 import profileIcon from "../assets/profileIcon.svg";
 import settingsIcon from "../assets/settings.svg";
@@ -11,6 +11,12 @@ export default function NavBar() {
   const navigate = useNavigate();
   const [navOpen, setNavOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  const [avatarUrl, setAvatarUrl] = useState(
+    () => localStorage.getItem("avatarUrl") || null
+  );
+  const [userName, setUserName] = useState(
+    () => localStorage.getItem("userName") || ""
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -19,6 +25,16 @@ export default function NavBar() {
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Listen for avatar/name updates from ProfileSettings
+  useEffect(() => {
+    const handleAvatarUpdate = () => {
+      setAvatarUrl(localStorage.getItem("avatarUrl") || null);
+      setUserName(localStorage.getItem("userName") || "");
+    };
+    window.addEventListener("avatarUpdated", handleAvatarUpdate);
+    return () => window.removeEventListener("avatarUpdated", handleAvatarUpdate);
   }, []);
 
   const navItems = [
@@ -31,6 +47,8 @@ export default function NavBar() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("avatarUrl");
+    localStorage.removeItem("userName");
     navigate("/LoginPage");
   };
 
@@ -47,7 +65,6 @@ export default function NavBar() {
               Sustainable Finance
             </p>
           </div>
-          {/* Only show close button on mobile */}
           {!isDesktop && (
             <button
               onClick={() => setNavOpen(false)}
@@ -85,20 +102,72 @@ export default function NavBar() {
         </nav>
       </div>
 
-      {/* Logout */}
-      <button
-        onClick={handleLogout}
-        style={{
-          display: "flex", alignItems: "center", gap: 12,
-          padding: "10px 16px", borderRadius: 8,
-          border: "none", background: "none",
-          fontSize: 14, fontWeight: 600,
-          color: "#BA1A1A", cursor: "pointer",
-        }}
-      >
-        <FaSignOutAlt />
-        <span>Log out</span>
-      </button>
+      {/* ── BOTTOM: User card + Logout ── */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+
+        {/* User card */}
+        <div
+          onClick={() => navigate("/ProfileAndSettings")}
+          style={{
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "10px 16px",
+            borderRadius: 8,
+            cursor: "pointer",
+            borderTop: "1px solid #BFC9BD",
+            paddingTop: 16,
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = "#E6E8EA"}
+          onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+        >
+          {/* Avatar */}
+          <div style={{
+            width: 36, height: 36, borderRadius: 9999,
+            background: "#E6E8EA", overflow: "hidden",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            flexShrink: 0, border: "2px solid white",
+          }}>
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt="avatar"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                onError={() => {
+                  setAvatarUrl(null);
+                  localStorage.removeItem("avatarUrl");
+                }}
+              />
+            ) : (
+              <FaUser size={16} color="#BFC9BD" />
+            )}
+          </div>
+
+          {/* Name */}
+          <span style={{
+            fontSize: 13, fontWeight: 600, color: "#191C1E",
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+            flex: 1,
+          }}>
+            {userName || "My Account"}
+          </span>
+        </div>
+
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          style={{
+            display: "flex", alignItems: "center", gap: 12,
+            padding: "10px 16px", borderRadius: 8,
+            border: "none", background: "none",
+            fontSize: 14, fontWeight: 600,
+            color: "#BA1A1A", cursor: "pointer",
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.background = "#FFDAD6"}
+          onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+        >
+          <FaSignOutAlt />
+          <span>Log out</span>
+        </button>
+      </div>
     </div>
   );
 
@@ -136,9 +205,11 @@ export default function NavBar() {
         zIndex: 1000,
         boxSizing: "border-box",
       }}>
-        <h1 style={{ fontFamily: "Inter", fontSize: 18, fontWeight: 700, color: "#004C22", margin: 0 }}>
-          EcoSpend
-        </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <h1 style={{ fontFamily: "Inter", fontSize: 18, fontWeight: 700, color: "#004C22", margin: 0 }}>
+            EcoSpend
+          </h1>
+        </div>
         <button
           onClick={() => setNavOpen(true)}
           style={{ background: "none", border: "none", cursor: "pointer", padding: 8, display: "flex" }}

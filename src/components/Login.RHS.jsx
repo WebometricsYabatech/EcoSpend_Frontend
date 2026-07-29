@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import google from "../assets/google.svg";
-import { loginUser } from "../api";
+import { loginUser, getUserProfile } from "../api";
 
 export default function LoginRHS() {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,10 +18,33 @@ export default function LoginRHS() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
+  
     try {
+      // Login
       const data = await loginUser(email, password);
-      if (data.token) localStorage.setItem("token", data.token);
+  
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+  
+      // Fetch profile after login
+      const profile = await getUserProfile();
+  
+      const user = profile.user || profile;
+  
+      localStorage.setItem(
+        "userName",
+        user.fullname || user.fullName || user.name || ""
+      );
+  
+      localStorage.setItem(
+        "avatarUrl",
+        user.avatarUrl || ""
+      );
+  
+      // Notify NavBar and TopNavbar
+      window.dispatchEvent(new Event("avatarUpdated"));
+  
       navigate("/Welcome");
     } catch (err) {
       setError(err.message);

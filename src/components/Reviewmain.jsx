@@ -21,24 +21,25 @@ const EMPTY_ITEM = { name: "", price: "", category: "Groceries" };
 export default function ReviewReceipt() {
   const navigate = useNavigate();
   const location = useLocation();
-
+ 
   const scannedData = location.state?.receiptData || {
-    store: "Whole Foods Market",
-    date: "Oct 24, 2023",
-    total: "$42.85",
-    items: [
-      { name: "Organic Spinach", price: "$4.99", category: "Groceries" },
-      { name: "Fair Trade Coffee", price: "$12.50", category: "Groceries" },
-      { name: "Almond Milk", price: "$3.99", category: "Groceries" },
-    ],
+    store: "",
+    date: "",
+    total: 0,
+    sustainabilityScore: 0,
+    sustainabilityTip: "",
+    items: [],
   };
-
-  const [store, setStore] = useState(scannedData.store);
-  const [date, setDate] = useState(scannedData.date);
-  const [total, setTotal] = useState(scannedData.total);
-  const [items, setItems] = useState(scannedData.items);
+  
+  const [store, setStore] = useState(scannedData.store || "");
+  const [date, setDate] = useState(scannedData.date || "");
+  const [total, setTotal] = useState(scannedData.total ?? 0);;
+  const [items, setItems] = useState(scannedData.items || []); // ← add || []
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
+  const receiptImage = scannedData.receiptImage;
+  const sustainabilityScore = scannedData.sustainabilityScore;
+const sustainabilityTip = scannedData.sustainabilityTip;
 
   const handleItemChange = (index, field, value) => {
     const updated = [...items];
@@ -58,8 +59,11 @@ export default function ReviewReceipt() {
       const receiptData = {
         store,
         date,
-        total,
-        items,
+        total: Number(total),
+        items: items.map(item => ({
+          ...item,
+          price: Number(item.price),
+        })),
       };
   
       const response = await confirmReceipt(receiptData);
@@ -68,7 +72,12 @@ export default function ReviewReceipt() {
   
       navigate("/ReviewDetails", {
         state: {
-          receiptData: response,
+          receiptData: {
+            ...receiptData,
+            sustainabilityScore,
+            sustainabilityTip,
+            receiptImage: scannedData.receiptImage,
+          },
         },
       });
     } catch (err) {
@@ -107,6 +116,42 @@ export default function ReviewReceipt() {
           AI extracted {items.length} items from your receipt at {store}. Please verify and confirm.
         </p>
       </div>
+      <div
+  style={{
+    background: "#F2F4F6",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  }}
+>
+  <h3 style={{ margin: 0 }}>Sustainability Score</h3>
+
+  <p
+    style={{
+      fontSize: 30,
+      fontWeight: "700",
+      color: "#006E2F",
+      margin: "10px 0",
+    }}
+  >
+    {sustainabilityScore}/10
+  </p>
+
+  <p>{sustainabilityTip}</p>
+</div>
+{error && (
+  <div
+    style={{
+      background: "#FDECEC",
+      color: "#B00020",
+      padding: "12px",
+      borderRadius: "8px",
+      marginBottom: "16px",
+    }}
+  >
+    {error}
+  </div>
+)}
 
       {/* SIDE BY SIDE LAYOUT */}
       <div style={{ display: "flex", flexDirection: "row", gap: 24, alignItems: "flex-start" }}>
@@ -133,10 +178,14 @@ export default function ReviewReceipt() {
             position: "relative",
           }}>
             <img
-              src="https://placehold.co/600x400"
-              alt="Scanned receipt"
-              style={{ width: "100%", opacity: 0.9, display: "block" }}
-            />
+  src={receiptImage || "https://placehold.co/600x400"}
+  alt="Scanned receipt"
+  style={{
+    width: "100%",
+    display: "block",
+    objectFit: "cover",
+  }}
+/>
             <div style={{
               position: "absolute", inset: 0,
               background: "linear-gradient(0deg, rgba(0,0,0,0.20) 0%, rgba(0,0,0,0) 100%)",
@@ -175,14 +224,24 @@ export default function ReviewReceipt() {
             }}>
               <span style={{ fontFamily: "inter", fontSize: 20, fontWeight: 600, color: "#191C1E" }}>Total</span>
               <input
-                value={total}
-                onChange={(e) => setTotal(e.target.value)}
-                style={{
-                  border: "1px solid #BFC9BD", borderRadius: 6, padding: "4px 10px",
-                  fontFamily: "inter", fontSize: 20, fontWeight: 600, color: "#004C22",
-                  textAlign: "right", outline: "none", background: "white", width: 120,
-                }}
-              />
+  type="number"
+  step="0.01"
+  value={total}
+  onChange={(e) => setTotal(Number(e.target.value))}
+  style={{
+    border: "1px solid #BFC9BD",
+    borderRadius: 6,
+    padding: "4px 10px",
+    fontFamily: "inter",
+    fontSize: 20,
+    fontWeight: 600,
+    color: "#004C22",
+    textAlign: "right",
+    outline: "none",
+    background: "white",
+    width: 120,
+  }}
+/>
             </div>
           </div>
         </div>
@@ -226,14 +285,13 @@ export default function ReviewReceipt() {
                     }}
                   />
                   <input
-                    value={item.price}
-                    onChange={(e) => handleItemChange(index, "price", e.target.value)}
-                    placeholder="$0.00"
-                    style={{
-                      padding: "11px 16px", borderRadius: 8, border: "1px solid #BFC9BD",
-                      fontSize: 16, color: "#191C1E", outline: "none", background: "white",
-                    }}
-                  />
+                 type="number"
+                 step="0.01"
+                 value={item.price}
+                 onChange={(e) =>
+                  handleItemChange(index, "price", Number(e.target.value))
+                    }
+                    />
                   <select
                     value={item.category}
                     onChange={(e) => handleItemChange(index, "category", e.target.value)}

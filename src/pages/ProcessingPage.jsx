@@ -3,7 +3,7 @@ import "../App.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaCheck, FaReceipt } from "react-icons/fa";
 import { FaHourglass } from "react-icons/fa6";
-import { scanReceipt } from "../api.js"; 
+import { scanReceipt } from "../api";
 
 export default function ProcessingPage() {
   const [progress, setProgress] = useState(0);
@@ -22,41 +22,42 @@ export default function ProcessingPage() {
 
     const processReceipt = async () => {
       try {
-        // Step 1 - Upload
+        // Step 1
         setProgress(20);
         setStatus("Uploading receipt...");
-        await new Promise((res) => setTimeout(res, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Step 2 - Scan receipt
+        // Step 2
         setProgress(40);
         setStatus("Reading receipt...");
 
-        const data = await scanReceipt(file);
+        const response = await scanReceipt(file);
+        const extracted = response.extractedData;
 
-        // Step 3 - Carbon calculation
+        // Step 3
         setProgress(70);
         setStatus("Calculating carbon footprint...");
-        await new Promise((res) => setTimeout(res, 600));
+        await new Promise((resolve) => setTimeout(resolve, 600));
 
-        // Step 4 - Insights
+        // Step 4
         setProgress(90);
         setStatus("Generating sustainability insights...");
-        await new Promise((res) => setTimeout(res, 800));
+        await new Promise((resolve) => setTimeout(resolve, 800));
 
         setProgress(100);
         setStatus("Complete!");
 
         setTimeout(() => {
-          navigate("/ReviewReceipt", {
+          navigate("/ReviewPage", {
             state: {
               receiptData: {
-                store: data.store,
-                date: data.date,
-                total: data.total,
-                items: data.items,
-                carbonFootprint: data.carbonFootprint,
-                sustainabilityScore: data.sustainabilityScore,
-                recommendations: data.recommendations,
+                receiptImage: URL.createObjectURL(file),
+                store: extracted.store,
+                date: extracted.date,
+                total: extracted.totalAmount,
+                items: extracted.items,
+                sustainabilityScore: extracted.sustainabilityScore,
+                sustainabilityTip: extracted.sustainabilityTip,
               },
             },
           });
@@ -70,13 +71,11 @@ export default function ProcessingPage() {
     processReceipt();
   }, [file, navigate]);
 
-  // Animate progress while backend is processing
   useEffect(() => {
     if (error) return;
 
     const timer = setInterval(() => {
       setProgress((prev) => {
-        // Don't override actual progress updates
         if (prev >= 85) {
           clearInterval(timer);
           return prev;
@@ -92,12 +91,11 @@ export default function ProcessingPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#005321] px-6">
       <div className="w-full max-w-lg text-center">
-        {/* Animated Circle */}
+        {/* Spinner */}
         <div className="mx-auto mb-8 flex h-28 w-28 animate-spin items-center justify-center rounded-full border-4 border-green-400 border-t-transparent">
           <FaReceipt size={40} className="text-green-300" />
         </div>
 
-        {/* Heading */}
         <h1 className="font-['Inter'] text-4xl font-bold text-white">
           Processing Receipt
         </h1>
@@ -120,7 +118,6 @@ export default function ProcessingPage() {
           </div>
         ) : (
           <>
-            {/* Progress Bar */}
             <div className="mt-10">
               <div className="mb-2 flex justify-between text-sm text-green-200">
                 <span>{status}</span>
@@ -135,7 +132,6 @@ export default function ProcessingPage() {
               </div>
             </div>
 
-            {/* Processing Steps */}
             <div className="mt-8 space-y-3 text-left text-green-100">
               <div className="flex items-center gap-3">
                 {progress >= 20 ? <FaCheck /> : <FaHourglass />}

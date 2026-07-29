@@ -39,7 +39,7 @@ export default function ReceiptDetails() {
   const [showAllItems, setShowAllItems] = useState(false);
 
   // Data passed from ReviewReceipt after confirmation
-  const receiptData = location.state?.confirmedData || {
+  const receiptData = location.state?.receiptData || {
     store: "Whole Foods Market",
     location: "San Francisco, CA",
     date: "Oct 24, 2023 • 14:32",
@@ -88,15 +88,19 @@ export default function ReceiptDetails() {
       },
     ],
   };
+  console.log("FULL RECEIPT DATA:", JSON.stringify(receiptData, null, 2));
+  const items = receiptData.items || [];
 
-  const visibleItems = showAllItems
-    ? receiptData.items
-    : receiptData.items.slice(0, 4);
+const visibleItems = showAllItems
+  ? items
+  : items.slice(0, 4);
 
   // Eco score circle
+  const ecoScorePercentage = (receiptData.sustainabilityScore / 10) * 100;
+
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
-  const strokeDash = (receiptData.ecoScore / 100) * circumference;
+  const strokeDash = (ecoScorePercentage / 100) * circumference;
 
   return (
     <div
@@ -254,14 +258,14 @@ export default function ReceiptDetails() {
               }}
             >
               <img
-                src="https://placehold.co/400x600"
-                alt="Scanned receipt"
-                style={{
-                  width: "100%",
-                  display: "block",
-                  opacity: 0.9,
-                }}
-              />
+             src={receiptData.receiptImage}
+             alt="Scanned receipt"
+             style={{
+             width: "100%",
+             display: "block",
+             opacity: 0.9,
+             }}
+             />
             </div>
           </div>
         </div>
@@ -434,7 +438,7 @@ export default function ReceiptDetails() {
                     fill="#191C1E"
                     fontFamily="Inter"
                   >
-                    {receiptData.ecoScore}
+                    {ecoScorePercentage}%
                   </text>
                 </svg>
 
@@ -461,7 +465,7 @@ export default function ReceiptDetails() {
                       lineHeight: "20px",
                     }}
                   >
-                    {receiptData.ecoMessage}
+                    {receiptData.sustainabilityTip}
                   </p>
                 </div>
               </div>

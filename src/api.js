@@ -126,15 +126,26 @@ export async function exportData(format, dateRange) {
 export async function scanReceipt(file) {
   const formData = new FormData();
   formData.append("receipt", file);
+
   const token = localStorage.getItem("token");
+
   const response = await fetch(`${BASE_URL}/api/ai/scan-receipt`, {
     method: "POST",
-    headers: { ...(token && { Authorization: `Bearer ${token}` }) },
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
     body: formData,
   });
-  const text = await response.text();
-  const data = JSON.parse(text);
-  if (!response.ok) throw new Error(data.message || "Failed to scan receipt.");
+
+  const data = await response.json();
+
+  console.log("Status:", response.status);
+  console.log("Response:", data);
+
+  if (!response.ok) {
+    throw new Error(data.error || data.message || "Failed to scan receipt");
+  }
+
   return data;
 }
 

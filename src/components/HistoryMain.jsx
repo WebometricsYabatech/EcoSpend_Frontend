@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,6 +11,8 @@ import {
   FaReceipt,
 } from "react-icons/fa";
 import { FiSliders } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { getReceipts } from "../api";
 
 const CATEGORY_COLORS = {
   Groceries: "#006E2F",
@@ -67,17 +69,44 @@ export default function ReceiptHistory() {
 
   // Toggle this to `true` once connected to backend
   // For now: new users see empty state
-  const [receipts] = useState([]);
+  const [receipts, setReceipts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
   const [dateFilter, setDateFilter] = useState("Last 30 Days");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  useEffect(() => {
+    getReceipts()
+      .then((data) => {
+        console.log("RECEIPTS:", data);
+        setReceipts(data);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const mappedReceipts = receipts.map((r) => ({
+    id: r.id,
+    store: r.storeName || "Unknown Store",
+    date: new Date(r.date).toLocaleString(),
+    itemCount: 1,
+    categories: [r.category || "Other"],
+    total: `$${Number(r.amount).toFixed(2)}`,
+    ecoScore: r.sustainabilityScore ?? 0,
+  }));
 
   const hasReceipts = receipts.length > 0;
+  if (loading) {
+    return (
+      <div style={{ padding: 40 }}>
+        Loading receipts...
+      </div>
+    );
+  }
 
   // Filter logic
-  const filtered = receipts.filter((r) => {
+  const filtered = mappedReceipts.filter((r) => { 
     const matchesSearch =
       r.store.toLowerCase().includes(search.toLowerCase()) ||
       r.categories.some((c) =>
@@ -143,7 +172,7 @@ export default function ReceiptHistory() {
               lineHeight: "40px",
             }}
           >
-            Your receipts {hasReceipts && `(${receipts.length})`}
+            Your receipts {hasReceipts && `(${mappedReceipts.length})`}
           </h1>
           <p
             style={{
