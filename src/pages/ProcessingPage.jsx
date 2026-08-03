@@ -33,7 +33,7 @@ export default function ProcessingPage() {
 
         const response = await scanReceipt(file);
         const extracted = response.extractedData;
-
+        console.log(response);
         // Step 3
         setProgress(70);
         setStatus("Calculating carbon footprint...");

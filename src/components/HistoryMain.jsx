@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "../App.css";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,8 +11,7 @@ import {
   FaReceipt,
 } from "react-icons/fa";
 import { FiSliders } from "react-icons/fi";
-import { useState, useEffect } from "react";
-import { getReceipts } from "../api";
+import { getReceiptHistory } from "../api";
 
 const CATEGORY_COLORS = {
   Groceries: "#006E2F",
@@ -31,90 +30,70 @@ const getEcoScoreStyle = (score) => {
   return { bg: "rgba(186,26,26,0.10)", color: "#BA1A1A" };
 };
 
-// ── PLACEHOLDER DATA (shown once receipts exist) ──
-const MOCK_RECEIPTS = [
-  {
-    id: 1,
-    store: "Whole Foods Market",
-    date: "Oct 24, 2023 • 14:32",
-    itemCount: 12,
-    categories: ["Groceries"],
-    total: "$142.50",
-    ecoScore: 84,
-  },
-  {
-    id: 2,
-    store: "Blue Bottle Coffee",
-    date: "Oct 23, 2023 • 08:15",
-    itemCount: 2,
-    categories: ["Dining"],
-    total: "$12.40",
-    ecoScore: 92,
-  },
-  {
-    id: 3,
-    store: "Shell Energy Station",
-    date: "Oct 21, 2023 • 17:45",
-    itemCount: 1,
-    categories: ["Transport"],
-    total: "$68.90",
-    ecoScore: 32,
-  },
-];
-
 const ITEMS_PER_PAGE = 10;
 
 export default function ReceiptHistory() {
   const navigate = useNavigate();
-
-  // Toggle this to `true` once connected to backend
-  // For now: new users see empty state
   const [receipts, setReceipts] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [search, setSearch] = useState("");
   const [dateFilter, setDateFilter] = useState("Last 30 Days");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
   useEffect(() => {
-    getReceipts()
-      .then((data) => {
-        console.log("RECEIPTS:", data);
-        setReceipts(data);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    const fetchReceiptHistory = async () => {
+      try {
+        const data = await getReceiptHistory();
+  
+        console.log("Receipt History:", data);
+        console.log("First Receipt:", data.receipts?.[0]);
+        console.log(JSON.stringify(data.receipts[0]));
+  
+        // Save receipts from the backend
+        setReceipts(data.receipts ?? []);
+      } catch (err) {
+        console.error("Failed to fetch receipt history:", err);
+        setReceipts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchReceiptHistory();
   }, []);
+  
 
-  const mappedReceipts = receipts.map((r) => ({
-    id: r.id,
-    store: r.storeName || "Unknown Store",
-    date: new Date(r.date).toLocaleString(),
-    itemCount: 1,
-    categories: [r.category || "Other"],
-    total: `$${Number(r.amount).toFixed(2)}`,
-    ecoScore: r.sustainabilityScore ?? 0,
-  }));
-
-  const hasReceipts = receipts.length > 0;
   if (loading) {
     return (
-      <div style={{ padding: 40 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "60vh",
+        }}
+      >
         Loading receipts...
       </div>
     );
   }
+  
 
-  // Filter logic
-  const filtered = mappedReceipts.filter((r) => { 
+  const hasReceipts = receipts.length > 0;
+
+  const filtered = receipts.filter((r) => {
+    const store = r.storeName || "";
+    const category = r.category || "";
+  
     const matchesSearch =
-      r.store.toLowerCase().includes(search.toLowerCase()) ||
-      r.categories.some((c) =>
-        c.toLowerCase().includes(search.toLowerCase())
-      );
+      store.toLowerCase().includes(search.toLowerCase()) ||
+      category.toLowerCase().includes(search.toLowerCase());
+  
     const matchesCategory = categoryFilter
-      ? r.categories.includes(categoryFilter)
+      ? category === categoryFilter
       : true;
+  
     return matchesSearch && matchesCategory;
   });
 
@@ -125,19 +104,28 @@ export default function ReceiptHistory() {
   );
 
   const handleRowClick = (receipt) => {
-    navigate("/ReceiptDetails", {
+    const ecoScore = receipt.sustainabilityScore ?? 0;
+  
+    navigate(`/ReviewDetails/${receipt.receiptId}`, {
       state: {
         confirmedData: {
-          store: receipt.store,
+          receiptId: receipt.receiptId,
+          store: receipt.storeName,
           date: receipt.date,
-          total: receipt.total,
-          ecoScore: receipt.ecoScore,
-          ecoLabel: receipt.ecoScore >= 70 ? "High Impact" : receipt.ecoScore >= 40 ? "Medium Impact" : "Low Impact",
+          total: Number(receipt.totalAmount),
+          ecoScore,
+          ecoLabel:
+            ecoScore >= 70
+              ? "High Impact"
+              : ecoScore >= 40
+              ? "Medium Impact"
+              : "Low Impact",
           ecoMessage: "",
           goalProgress: 78,
           goalMessage: "",
           location: "",
-          items: [],
+          items: receipt.items || [],
+          category: receipt.category,
         },
       },
     });
@@ -172,7 +160,7 @@ export default function ReceiptHistory() {
               lineHeight: "40px",
             }}
           >
-            Your receipts {hasReceipts && `(${mappedReceipts.length})`}
+            Your receipts {hasReceipts && `(${receipts.length})`}
           </h1>
           <p
             style={{
@@ -218,18 +206,27 @@ export default function ReceiptHistory() {
           border: "1px solid rgba(191,201,189,0.30)",
           boxShadow: "0px 1px 2px rgba(0,0,0,0.05)",
           marginBottom: 32,
+          flexWrap: "wrap",
         }}
       >
         {/* Search */}
-        <div style={{ flex: 1, position: "relative" }}>
+        <div style={{ flex: 1, minWidth: 200, position: "relative" }}>
           <FaSearch
             size={16}
             color="#404940"
-            style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }}
+            style={{
+              position: "absolute",
+              left: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+            }}
           />
           <input
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Search stores or items..."
             style={{
               width: "100%",
@@ -271,7 +268,13 @@ export default function ReceiptHistory() {
           <FaFilter
             size={12}
             color="#404940"
-            style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+            style={{
+              position: "absolute",
+              right: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+            }}
           />
         </div>
 
@@ -279,7 +282,10 @@ export default function ReceiptHistory() {
         <div style={{ position: "relative" }}>
           <select
             value={categoryFilter}
-            onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setCurrentPage(1);
+            }}
             style={{
               padding: "8px 36px 8px 16px",
               background: "#F7F9FB",
@@ -305,7 +311,13 @@ export default function ReceiptHistory() {
           <FiSliders
             size={14}
             color="#404940"
-            style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+            style={{
+              position: "absolute",
+              right: 12,
+              top: "50%",
+              transform: "translateY(-50%)",
+              pointerEvents: "none",
+            }}
           />
         </div>
       </div>
@@ -326,7 +338,6 @@ export default function ReceiptHistory() {
             textAlign: "center",
           }}
         >
-          {/* Icon */}
           <div
             style={{
               width: 80,
@@ -388,9 +399,7 @@ export default function ReceiptHistory() {
             Upload your first receipt
           </button>
         </div>
-
       ) : (
-
         /* ── RECEIPTS TABLE ── */
         <div
           style={{
@@ -411,92 +420,137 @@ export default function ReceiptHistory() {
               padding: "0 24px",
             }}
           >
-            {["Store & Date", "Items", "Category", "Total", "Eco Score", ""].map((h) => (
-              <div
-                key={h}
-                style={{
-                  padding: "16px 0",
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: "#404940",
-                }}
-              >
-                {h}
-              </div>
-            ))}
+            {["Store & Date", "Items", "Category", "Total", "Eco Score", ""].map(
+              (h) => (
+                <div
+                  key={h}
+                  style={{
+                    padding: "16px 0",
+                    fontSize: 16,
+                    fontWeight: 700,
+                    color: "#404940",
+                  }}
+                >
+                  {h}
+                </div>
+              )
+            )}
           </div>
 
           {/* Table rows */}
           {paginated.length === 0 ? (
-            <div style={{ padding: "40px 24px", textAlign: "center", color: "#404940" }}>
+            <div
+              style={{ padding: "40px 24px", textAlign: "center", color: "#404940" }}
+            >
               No receipts match your search.
             </div>
           ) : (
             paginated.map((receipt, index) => {
-              const scoreStyle = getEcoScoreStyle(receipt.ecoScore);
+              const ecoScore = receipt.sustainabilityScore ?? 0;
+              const scoreStyle = getEcoScoreStyle(ecoScore); 
               return (
                 <div
-                  key={receipt.id}
+                  key={receipt.receiptId}
                   onClick={() => handleRowClick(receipt)}
                   style={{
                     display: "grid",
                     gridTemplateColumns: "2fr 1fr 1.5fr 1fr 1fr 40px",
                     padding: "0 24px",
-                    borderTop: index === 0 ? "none" : "1px solid rgba(191,201,189,0.30)",
+                    borderTop:
+                      index === 0
+                        ? "none"
+                        : "1px solid rgba(191,201,189,0.30)",
                     alignItems: "center",
                     cursor: "pointer",
                     transition: "background 0.15s",
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = "#F7F9FB"}
-                  onMouseLeave={(e) => e.currentTarget.style.background = "white"}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background = "#F7F9FB")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background = "white")
+                  }
                 >
                   {/* Store & Date */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 0" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 16,
+                      padding: "16px 0",
+                    }}
+                  >
                     <div
                       style={{
-                        width: 40, height: 40, borderRadius: 8,
-                        background: "#E6E8EA", display: "flex",
-                        alignItems: "center", justifyContent: "center", flexShrink: 0,
+                        width: 40,
+                        height: 40,
+                        borderRadius: 8,
+                        background: "#E6E8EA",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
                       }}
                     >
                       <FaLeaf color="#404940" size={16} />
                     </div>
                     <div>
-                      <p style={{ margin: 0, fontSize: 16, color: "#191C1E", lineHeight: "24px" }}>
-                        {receipt.store}
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: 16,
+                          color: "#191C1E",
+                          lineHeight: "24px",
+                        }}
+                      >
+                        {receipt.storeName}
                       </p>
-                      <p style={{ margin: 0, fontSize: 14, color: "#404940", lineHeight: "20px" }}>
-                        {receipt.date}
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: 14,
+                          color: "#404940",
+                          lineHeight: "20px",
+                        }}
+                      >
+                        {new Date(receipt.date).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
 
                   {/* Items */}
                   <div style={{ fontSize: 16, color: "#404940" }}>
-                    {receipt.itemCount} {receipt.itemCount === 1 ? "item" : "items"}
+                  {receipt.items?.length ?? receipt.itemCount}{" "}
+                  {(receipt.items?.length ?? receipt.itemCount) === 1 ? "item" : "items"}
                   </div>
 
                   {/* Category */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    {receipt.categories.map((cat) => (
-                      <span
-                        key={cat}
-                        style={{
-                          width: 8, height: 8, borderRadius: 9999,
-                          background: CATEGORY_COLORS[cat] || "#404940",
-                          display: "inline-block",
-                          flexShrink: 0,
-                        }}
-                      />
-                    ))}
-                    <span style={{ fontSize: 16, color: "#404940" }}>
-                      {receipt.categories.join(", ")}
-                    </span>
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 6 }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                   <span
+                   style={{
+                   width: 8,
+                   height: 8,
+                   borderRadius: 9999,
+                  background: CATEGORY_COLORS[receipt.category] || "#404940",
+                  display: "inline-block",
+                  flexShrink: 0,
+                 }}
+                  />
+                  <span style={{ fontSize: 16, color: "#404940" }}>
+                  {receipt.category || "Other"}
+                 </span>
+                 </div>
+                 <span style={{ fontSize: 16, color: "#404940" }}>
+                 {receipt.category || "Other"}
+                 </span>
                   </div>
 
                   {/* Total */}
                   <div style={{ fontSize: 16, color: "#191C1E" }}>
-                    {receipt.total}
+                  ${Number(receipt.totalAmount).toFixed(2)}
                   </div>
 
                   {/* Eco Score */}
@@ -516,11 +570,14 @@ export default function ReceiptHistory() {
                     >
                       <span
                         style={{
-                          width: 8, height: 8, borderRadius: 9999,
-                          background: scoreStyle.color, display: "inline-block",
+                          width: 8,
+                          height: 8,
+                          borderRadius: 9999,
+                          background: scoreStyle.color,
+                          display: "inline-block",
                         }}
                       />
-                      {receipt.ecoScore}
+                      {ecoScore}
                     </span>
                   </div>
 
@@ -558,39 +615,63 @@ export default function ReceiptHistory() {
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
                 style={{
-                  width: 32, height: 32, borderRadius: 8, border: "none",
-                  background: "none", cursor: currentPage === 1 ? "default" : "pointer",
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  border: "none",
+                  background: "none",
+                  cursor: currentPage === 1 ? "default" : "pointer",
                   opacity: currentPage === 1 ? 0.3 : 1,
-                  display: "flex", alignItems: "center", justifyContent: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <FaChevronLeft size={10} color="#404940" />
               </button>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  style={{
-                    width: 32, height: 32, borderRadius: 8, border: "none",
-                    background: currentPage === page ? "#004C22" : "none",
-                    color: currentPage === page ? "white" : "#404940",
-                    fontSize: 16, cursor: "pointer",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}
-                >
-                  {page}
-                </button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      border: "none",
+                      background:
+                        currentPage === page ? "#004C22" : "none",
+                      color: currentPage === page ? "white" : "#404940",
+                      fontSize: 16,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
 
               <button
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
                 disabled={currentPage === totalPages}
                 style={{
-                  width: 32, height: 32, borderRadius: 8, border: "none",
-                  background: "none", cursor: currentPage === totalPages ? "default" : "pointer",
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  border: "none",
+                  background: "none",
+                  cursor:
+                    currentPage === totalPages ? "default" : "pointer",
                   opacity: currentPage === totalPages ? 0.3 : 1,
-                  display: "flex", alignItems: "center", justifyContent: "center",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <FaChevronRight size={10} color="#404940" />

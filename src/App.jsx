@@ -18,15 +18,15 @@ export default function App(){
   <Route path="/" element={<LandingPage />} />
   <Route path="/LoginPage" element={<LoginPage />} />
   <Route path="/SignupPage" element={<SignupPage />} />
-  <Route path="/ForgotPassword" element={<ForgotPassword/>}/>
-  <Route path="Welcome" element={<Welcome/>}/>
-  <Route path= "UploadReceipt" element={<UploadReceipt/>}/>
-  <Route path= "ProcessingPage" element={<ProcessingPage/>}/>
-  <Route path="ReviewPage" element={<ReviewPage/>}/>
-  <Route path="ReviewDetails" element={<ReviewDetails/>}/>
-  <Route path="ReceiptHistory" element={<ReceiptHistory/>}/>
-  <Route path="Dashboard" element={<Dashboard/>}/>
-  <Route path="ProfileAndSettings" element={<ProfileAndSettings/>}/>
+  <Route path="/ForgotPassword" element={<ForgotPassword />} />
+  <Route path="/Welcome" element={<Welcome />} />
+  <Route path="/UploadReceipt" element={<UploadReceipt />} />
+  <Route path="/ProcessingPage" element={<ProcessingPage />} />
+  <Route path="/ReviewPage" element={<ReviewPage />} />
+  <Route path="/ReviewDetails/:receiptId" element={<ReviewDetails />} />
+  <Route path="/ReceiptHistory" element={<ReceiptHistory />} />
+  <Route path="/Dashboard" element={<Dashboard />} />
+  <Route path="/ProfileAndSettings" element={<ProfileAndSettings />} />
 </Routes>
   );
 }

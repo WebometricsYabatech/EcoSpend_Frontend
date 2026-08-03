@@ -135,8 +135,8 @@ function EcoScoreLineChart({ data }) {
       cy={y(d.amount ?? 0)}
       r={4}
       fill="#006E2F"
-     />
-     ))}
+  />
+))}
     </svg>
   );
 }
@@ -168,17 +168,17 @@ export default function DashboardMain() {
   const overview = dashboardData?.overview || {};
   const categoryBreakdown = dashboardData?.categoryBreakdown || [];
   const dailyChart = dashboardData?.dailyChart || [];
-  const recentExpenses = dashboardData?.recentExpenses || [];
+  const recentReceipts = dashboardData?.recentReceipts || [];
   const ecoScore = dashboardData?.avgSustainabilityScore;
-
+  console.log("Recent Receipts:", recentReceipts);
   const totalSpent = overview.totalThisMonth ?? 0;
   const lastMonth = overview.totalLastMonth ?? 0;
   const monthChange = overview.monthChange ?? 0;
   const budgetUsed = overview.percentageUsed ?? 0;
   const isOverBudget = overview.isOverBudget ?? false;
-
+  
   // If no data at all, show empty state
-  const hasData = recentExpenses.length > 0 || totalSpent > 0;
+  const hasData = recentReceipts.length > 0 || totalSpent > 0;
 
   // Map category breakdown for donut chart
   const spendingByCategory = categoryBreakdown.map((cat, i) => ({
@@ -327,7 +327,7 @@ export default function DashboardMain() {
             <div style={{ background: "white", borderRadius: 12, padding: 24, boxShadow: "0px 1px 2px rgba(0,0,0,0.05)", display: "flex", flexDirection: "column", gap: 4 }}>
               <p style={{ margin: 0, fontSize: 16, color: "#404940" }}>Receipts Uploaded</p>
               <p style={{ margin: 0, fontFamily: "inter", fontSize: 32, fontWeight: 700, color: "#191C1E" }}>
-                {recentExpenses.length}
+                {recentReceipts.length}
               </p>
             </div>
 
@@ -378,7 +378,7 @@ export default function DashboardMain() {
               </div>
 
               {/* Table rows */}
-              {recentExpenses.map((r, i) => {
+              {recentReceipts.map((r, i) => {
                 const category = (r.category || r.categoryName || "OTHER").toUpperCase();
                 const catStyle = CATEGORY_STYLES[category] || CATEGORY_STYLES.OTHER;
                 const score = r.sustainabilityScore ?? r.ecoScore ?? null;
@@ -390,7 +390,7 @@ export default function DashboardMain() {
                 return (
                   <div
                     key={i}
-                    onClick={() => navigate("/ReceiptDetails", { state: { confirmedData: r } })}
+                    onClick={() => navigate(`/ReviewDetails/${receiptData.receiptId}`, { state: { confirmedData: r } })}
                     style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.5fr 1.5fr 1fr", padding: "0 24px", borderTop: i === 0 ? "none" : "1px solid #BFC9BD", alignItems: "center", cursor: "pointer" }}
                     onMouseEnter={(e) => e.currentTarget.style.background = "#F7F9FB"}
                     onMouseLeave={(e) => e.currentTarget.style.background = "white"}

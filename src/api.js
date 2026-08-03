@@ -371,3 +371,20 @@ export async function updateTransaction(id, transactionData) {
   if (!response.ok) throw new Error(data.message || "Failed to update transaction.");
   return data;
 }
+export async function getReceiptHistory() {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${BASE_URL}/api/receipts/history`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch receipt history.");
+  }
+
+  return data;
+}
