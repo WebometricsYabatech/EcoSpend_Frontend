@@ -340,6 +340,17 @@ export default function ProfileSettings() {
 
   const passwordMismatch = confirmPassword.length > 0 && newPassword !== confirmPassword;
   const passwordMatch = confirmPassword.length > 0 && newPassword === confirmPassword;
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth < 768);
+  };
+
+  window.addEventListener("resize", handleResize);
+
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
 
   // Load profile on mount
   useEffect(() => {
@@ -421,11 +432,39 @@ export default function ProfileSettings() {
   };
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "96px 40px 48px", fontFamily: "Inter, sans-serif" }}>
-      <div style={{ display: "flex", gap: 32, alignItems: "flex-start" }}>
+    <div
+  style={{
+    maxWidth: 1100,
+    width: "100%",
+    boxSizing: "border-box",
+    margin: "0 auto",
+    padding: isMobile
+      ? "24px 16px 32px"
+      : "40px 40px 48px",
+    fontFamily: "Inter, sans-serif",
+  }}
+>
+<div
+  style={{
+    display: "flex",
+    flexDirection: isMobile ? "column" : "row",
+    gap: isMobile ? 24 : 32,
+    alignItems: "stretch",
+    width: "100%",
+  }}
+>
 
         {/* ── LEFT: PROFILE ── */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 24 }}>
+        <div
+  style={{
+    flex: 1,
+    width: "100%",
+    minWidth: 0,
+    display: "flex",
+    flexDirection: "column",
+    gap: 24,
+  }}
+>
 
           {/* Avatar + title */}
           <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
@@ -570,7 +609,16 @@ export default function ProfileSettings() {
         </div>
 
         {/* ── RIGHT: SETTINGS ── */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 24 }}>
+        <div
+  style={{
+    flex: 1,
+    width: "100%",
+    minWidth: 0,
+    display: "flex",
+    flexDirection: "column",
+    gap: 24,
+  }}
+>
           <div>
             <h1 style={{ margin: "0 0 4px", fontFamily: "inter", fontSize: 32, fontWeight: 700, color: "#004C22" }}>Settings</h1>
             <p style={{ margin: 0, fontSize: 16, color: "#404940", lineHeight: "24px" }}>Customize your experience and manage data.</p>
