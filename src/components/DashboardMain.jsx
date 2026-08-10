@@ -10,29 +10,6 @@ import {
 import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
 import { getDashboard } from "../api";
 
-const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-useEffect(() => {
-  const handleResize = () => {
-    setIsMobile(window.innerWidth < 768);
-  };
-
-  window.addEventListener("resize", handleResize);
-
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
-<div
-  style={{
-    maxWidth: 1200,
-    width: "100%",
-    boxSizing: "border-box",
-    margin: "0 auto",
-    padding: isMobile
-      ? "24px 16px 32px"
-      : "40px 40px 48px",
-    fontFamily: "Inter, sans-serif",
-  }}
-></div>
 // ── CATEGORY STYLES ──
 const CATEGORY_STYLES = {
   FOOD: { bg: "#6BFF8F", color: "#007432" },
@@ -186,7 +163,29 @@ export default function DashboardMain() {
       </div>
     );
   }
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+  
+    window.addEventListener("resize", handleResize);
+  
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  <div
+    style={{
+      maxWidth: 1200,
+      width: "100%",
+      boxSizing: "border-box",
+      margin: "0 auto",
+      padding: isMobile
+        ? "24px 16px 32px"
+        : "40px 40px 48px",
+      fontFamily: "Inter, sans-serif",
+    }}
+  ></div>
   // ── DERIVE VALUES FROM BACKEND RESPONSE ──
   const overview = dashboardData?.overview || {};
   const categoryBreakdown = dashboardData?.categoryBreakdown || [];
