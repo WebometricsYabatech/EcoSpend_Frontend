@@ -112,7 +112,8 @@ export default function ReceiptHistory() {
   );
 
   const handleRowClick = (receipt) => {
-    const ecoScore = receipt.sustainabilityScore ?? 0;
+    const rawScore = Number(receipt.sustainabilityScore ?? 0);
+    const ecoScore = rawScore <= 10 ? rawScore * 10 : rawScore;
   
     navigate(`/ReviewDetails/${receipt.receiptId}`, {
       state: {
@@ -469,7 +470,11 @@ export default function ReceiptHistory() {
             </div>
           ) : (
             paginated.map((receipt, index) => {
-              const ecoScore = receipt.sustainabilityScore ?? 0;
+              const rawScore = Number(receipt.sustainabilityScore ?? 0);
+
+             // Backend score is /10 → convert to percentage
+            const ecoScore = rawScore <= 10 ? rawScore * 10 : rawScore;
+
               const scoreStyle = getEcoScoreStyle(ecoScore);
               const itemCount = receipt.items?.length ?? receipt.itemCount ?? 0;
             
@@ -688,7 +693,7 @@ export default function ReceiptHistory() {
                               background: scoreStyle.color,
                             }}
                           />
-                          {ecoScore}
+                          {ecoScore}%
                         </span>
                       </div>
                     </div>
@@ -752,7 +757,7 @@ export default function ReceiptHistory() {
                               background: scoreStyle.color,
                             }}
                           />
-                          {ecoScore}
+                          {ecoScore}%
                         </span>
                       </div>
             
