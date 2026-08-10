@@ -51,27 +51,44 @@ export default function ReceiptDetails() {
       </div>
     );
   }
-
+  
+  const items = receiptData.items || [];
+  
+  const visibleItems = showAllItems
+    ? items
+    : items.slice(0, 4);
+  
   // Backend sustainabilityScore is currently on a 0–10 scale.
-// Convert it to 0–100 for display.
-const rawEcoScore =
-receiptData.ecoScore ?? receiptData.sustainabilityScore ?? 0;
-
-const ecoScorePercentage =
-rawEcoScore <= 10 ? rawEcoScore * 10 : rawEcoScore;
-
-const radius = 28;
-const circumference = 2 * Math.PI * radius;
-const strokeDash =
-(Math.min(Math.max(ecoScorePercentage, 0), 100) / 100) * circumference;
-
+  // Convert it to 0–100 for display.
+  const rawEcoScore =
+    Number(receiptData.ecoScore ?? receiptData.sustainabilityScore ?? 0);
+  
+  const ecoScorePercentage =
+    rawEcoScore <= 10 ? rawEcoScore * 10 : rawEcoScore;
+  
+  const safeEcoScore = Math.min(
+    Math.max(ecoScorePercentage, 0),
+    100
+  );
+  
+  const radius = 28;
+  const circumference = 2 * Math.PI * radius;
+  
+  const strokeDash =
+    (safeEcoScore / 100) * circumference;
   return (
-    <div style={{
-      maxWidth: 1100, margin: "0 auto",
-      padding: isMobile ? "24px 16px 32px" : "40px 40px 48px",
-      fontFamily: "Inter",
-      flexDirection: isMobile ? "column" : "row"
-    }}>
+    <div
+  style={{
+    width: "100%",
+    maxWidth: 1100,
+    margin: "0 auto",
+    padding: isMobile
+      ? "24px 16px 32px"
+      : "40px 40px 48px",
+    fontFamily: "Inter",
+    boxSizing: "border-box",
+  }}
+>
 
       {/* ── HEADER ── */}
       <div style={{
@@ -263,7 +280,7 @@ const strokeDash =
                   />
                   <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle"
                     fontSize={16} fontWeight={700} fill="#191C1E" fontFamily="Inter">
-                    {ecoScorePercentage}%
+                    {safeEcoScore}%
                   </text>
                 </svg>
                 <div>
