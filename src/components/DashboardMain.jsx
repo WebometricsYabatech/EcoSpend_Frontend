@@ -145,6 +145,7 @@ export default function DashboardMain() {
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
     getDashboard()
@@ -163,7 +164,6 @@ export default function DashboardMain() {
       </div>
     );
   }
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   useEffect(() => {
     const handleResize = () => {
