@@ -40,7 +40,7 @@ export default function ReceiptHistory() {
   const [dateFilter, setDateFilter] = useState("Last 30 Days");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   useEffect(() => {
     const fetchReceiptHistory = async () => {
       try {
@@ -62,7 +62,15 @@ export default function ReceiptHistory() {
   
     fetchReceiptHistory();
   }, []);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
   
+    window.addEventListener("resize", handleResize);
+  
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (loading) {
     return (
@@ -133,22 +141,26 @@ export default function ReceiptHistory() {
 
   return (
     <div
-      style={{
-        maxWidth: 1100,
-        margin: "0 auto",
-        padding: "64px 48px 48px",
-        fontFamily: "Inter, sans-serif",
-      }}
-    >
+  style={{
+    maxWidth: 1100,
+    width: "100%",
+    boxSizing: "border-box",
+    margin: "0 auto",
+    padding: isMobile ? "32px 16px 32px" : "64px 48px 48px",
+    fontFamily: "Inter, sans-serif",
+  }}
+>
       {/* ── HEADER ── */}
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-end",
-          marginBottom: 32,
-        }}
-      >
+  style={{
+    display: "flex",
+    flexDirection: isMobile ? "column" : "row",
+    justifyContent: "space-between",
+    alignItems: isMobile ? "stretch" : "flex-end",
+    gap: 20,
+    marginBottom: 24,
+  }}
+>
         <div>
           <h1
             style={{
@@ -175,31 +187,30 @@ export default function ReceiptHistory() {
         </div>
 
         <button
-          onClick={() => navigate("/UploadReceipt")}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "8px 24px",
-            background: "#004C22",
-            borderRadius: 8,
-            border: "none",
-            color: "white",
-            fontSize: 16,
-            cursor: "pointer",
-          }}
-        >
-          <FaUpload size={16} />
-          Upload New
-        </button>
+       onClick={() => navigate("/UploadReceipt")}
+       style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      padding: "10px 20px",
+      background: "#004C22",
+      borderRadius: 8,
+      border: "none",
+      color: "white",
+      fontSize: 15,
+      cursor: "pointer",
+      width: isMobile ? "100%" : "auto",
+  }}
+  ></button>
       </div>
 
       {/* ── SEARCH + FILTERS ── */}
       <div
         style={{
           display: "flex",
-          alignItems: "center",
-          gap: 16,
+          alignItems: isMobile ? "stretch" : "center",
+          gap: 12,
           padding: 16,
           background: "white",
           borderRadius: 12,
@@ -207,10 +218,18 @@ export default function ReceiptHistory() {
           boxShadow: "0px 1px 2px rgba(0,0,0,0.05)",
           marginBottom: 32,
           flexWrap: "wrap",
+          flexDirection: isMobile ? "column" : "row",
         }}
       >
         {/* Search */}
-        <div style={{ flex: 1, minWidth: 200, position: "relative" }}>
+        <div
+  style={{
+    flex: 1,
+    width: isMobile ? "100%" : "auto",
+    minWidth: isMobile ? 0 : 200,
+    position: "relative",
+  }}
+>
           <FaSearch
             size={16}
             color="#404940"
@@ -257,6 +276,8 @@ export default function ReceiptHistory() {
               outline: "none",
               cursor: "pointer",
               appearance: "none",
+              width: isMobile ? "100%" : "auto",
+             boxSizing: "border-box",
             }}
           >
             <option>Last 7 Days</option>
@@ -296,6 +317,8 @@ export default function ReceiptHistory() {
               outline: "none",
               cursor: "pointer",
               appearance: "none",
+              width: isMobile ? "100%" : "auto",
+             boxSizing: "border-box",
             }}
           >
             <option value="">Category</option>
@@ -412,14 +435,14 @@ export default function ReceiptHistory() {
         >
           {/* Table header */}
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "2fr 1fr 1.5fr 1fr 1fr 40px",
-              background: "rgba(242,244,246,0.50)",
-              borderBottom: "1px solid #BFC9BD",
-              padding: "0 24px",
-            }}
-          >
+  style={{
+    display: isMobile ? "none" : "grid",
+    gridTemplateColumns: "2fr 1fr 1.5fr 1fr 1fr 40px",
+    background: "rgba(242,244,246,0.50)",
+    borderBottom: "1px solid #BFC9BD",
+    padding: "0 24px",
+  }}
+>
             {["Store & Date", "Items", "Category", "Total", "Eco Score", ""].map(
               (h) => (
                 <div
@@ -447,15 +470,21 @@ export default function ReceiptHistory() {
           ) : (
             paginated.map((receipt, index) => {
               const ecoScore = receipt.sustainabilityScore ?? 0;
-              const scoreStyle = getEcoScoreStyle(ecoScore); 
+              const scoreStyle = getEcoScoreStyle(ecoScore);
+              const itemCount = receipt.items?.length ?? receipt.itemCount ?? 0;
+            
               return (
                 <div
                   key={receipt.receiptId}
                   onClick={() => handleRowClick(receipt)}
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "2fr 1fr 1.5fr 1fr 1fr 40px",
-                    padding: "0 24px",
+                    display: isMobile ? "flex" : "grid",
+                    flexDirection: isMobile ? "column" : undefined,
+                    gridTemplateColumns: isMobile
+                      ? undefined
+                      : "2fr 1fr 1.5fr 1fr 1fr 40px",
+                    gap: isMobile ? 14 : 0,
+                    padding: isMobile ? "18px 16px" : "0 24px",
                     borderTop:
                       index === 0
                         ? "none"
@@ -464,20 +493,21 @@ export default function ReceiptHistory() {
                     cursor: "pointer",
                     transition: "background 0.15s",
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "#F7F9FB")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "white")
-                  }
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#F7F9FB";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "white";
+                  }}
                 >
-                  {/* Store & Date */}
+                  {/* Store + Date */}
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: 16,
-                      padding: "16px 0",
+                      gap: 12,
+                      padding: isMobile ? 0 : "16px 0",
+                      width: "100%",
                     }}
                   >
                     <div
@@ -494,17 +524,23 @@ export default function ReceiptHistory() {
                     >
                       <FaLeaf color="#404940" size={16} />
                     </div>
-                    <div>
+            
+                    <div style={{ minWidth: 0, flex: 1 }}>
                       <p
                         style={{
                           margin: 0,
                           fontSize: 16,
                           color: "#191C1E",
                           lineHeight: "24px",
+                          fontWeight: 600,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
                         }}
                       >
-                        {receipt.storeName}
+                        {receipt.storeName || "Unknown Store"}
                       </p>
+            
                       <p
                         style={{
                           margin: 0,
@@ -516,79 +552,224 @@ export default function ReceiptHistory() {
                         {new Date(receipt.date).toLocaleDateString()}
                       </p>
                     </div>
+            
+                    {isMobile && (
+                      <FaChevronRight size={12} color="#404940" />
+                    )}
                   </div>
-
-                  {/* Items */}
-                  <div style={{ fontSize: 16, color: "#404940" }}>
-                  {receipt.items?.length ?? receipt.itemCount}{" "}
-                  {(receipt.items?.length ?? receipt.itemCount) === 1 ? "item" : "items"}
-                  </div>
-
-                  {/* Category */}
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 6 }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                   <span
-                   style={{
-                   width: 8,
-                   height: 8,
-                   borderRadius: 9999,
-                  background: CATEGORY_COLORS[receipt.category] || "#404940",
-                  display: "inline-block",
-                  flexShrink: 0,
-                 }}
-                  />
-                  <span style={{ fontSize: 16, color: "#404940" }}>
-                  {receipt.category || "Other"}
-                 </span>
-                 </div>
-                 <span style={{ fontSize: 16, color: "#404940" }}>
-                 {receipt.category || "Other"}
-                 </span>
-                  </div>
-
-                  {/* Total */}
-                  <div style={{ fontSize: 16, color: "#191C1E" }}>
-                  ${Number(receipt.totalAmount).toFixed(2)}
-                  </div>
-
-                  {/* Eco Score */}
-                  <div>
-                    <span
+            
+                  {/* Mobile details */}
+                  {isMobile ? (
+                    <div
                       style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 4,
-                        padding: "4px 8px",
-                        background: scoreStyle.bg,
-                        borderRadius: 9999,
-                        fontSize: 16,
-                        fontWeight: 700,
-                        color: scoreStyle.color,
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: 12,
+                        width: "100%",
+                        paddingTop: 4,
                       }}
                     >
-                      <span
+                      {/* Items */}
+                      <div>
+                        <p
+                          style={{
+                            margin: "0 0 4px",
+                            fontSize: 12,
+                            color: "#777",
+                          }}
+                        >
+                          Items
+                        </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: 15,
+                            color: "#404940",
+                          }}
+                        >
+                          {itemCount} {itemCount === 1 ? "item" : "items"}
+                        </p>
+                      </div>
+            
+                      {/* Total */}
+                      <div>
+                        <p
+                          style={{
+                            margin: "0 0 4px",
+                            fontSize: 12,
+                            color: "#777",
+                          }}
+                        >
+                          Total
+                        </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            fontSize: 15,
+                            fontWeight: 600,
+                            color: "#191C1E",
+                          }}
+                        >
+                          ${Number(receipt.totalAmount).toFixed(2)}
+                        </p>
+                      </div>
+            
+                      {/* Category */}
+                      <div>
+                        <p
+                          style={{
+                            margin: "0 0 4px",
+                            fontSize: 12,
+                            color: "#777",
+                          }}
+                        >
+                          Category
+                        </p>
+            
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: 9999,
+                              background:
+                                CATEGORY_COLORS[receipt.category] || "#404940",
+                              flexShrink: 0,
+                            }}
+                          />
+            
+                          <span
+                            style={{
+                              fontSize: 14,
+                              color: "#404940",
+                            }}
+                          >
+                            {receipt.category || "Other"}
+                          </span>
+                        </div>
+                      </div>
+            
+                      {/* Eco Score */}
+                      <div>
+                        <p
+                          style={{
+                            margin: "0 0 4px",
+                            fontSize: 12,
+                            color: "#777",
+                          }}
+                        >
+                          Eco Score
+                        </p>
+            
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                            padding: "4px 8px",
+                            background: scoreStyle.bg,
+                            borderRadius: 9999,
+                            fontSize: 14,
+                            fontWeight: 700,
+                            color: scoreStyle.color,
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: 7,
+                              height: 7,
+                              borderRadius: 9999,
+                              background: scoreStyle.color,
+                            }}
+                          />
+                          {ecoScore}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Desktop Items */}
+                      <div style={{ fontSize: 16, color: "#404940" }}>
+                        {itemCount} {itemCount === 1 ? "item" : "items"}
+                      </div>
+            
+                      {/* Desktop Category */}
+                      <div
                         style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: 9999,
-                          background: scoreStyle.color,
-                          display: "inline-block",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 6,
                         }}
-                      />
-                      {ecoScore}
-                    </span>
-                  </div>
-
-                  {/* Chevron */}
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <FaChevronRight size={10} color="#404940" />
-                  </div>
+                      >
+                        <span
+                          style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: 9999,
+                            background:
+                              CATEGORY_COLORS[receipt.category] || "#404940",
+                            display: "inline-block",
+                            flexShrink: 0,
+                          }}
+                        />
+            
+                        <span style={{ fontSize: 16, color: "#404940" }}>
+                          {receipt.category || "Other"}
+                        </span>
+                      </div>
+            
+                      {/* Desktop Total */}
+                      <div style={{ fontSize: 16, color: "#191C1E" }}>
+                        ${Number(receipt.totalAmount).toFixed(2)}
+                      </div>
+            
+                      {/* Desktop Eco Score */}
+                      <div>
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 4,
+                            padding: "4px 8px",
+                            background: scoreStyle.bg,
+                            borderRadius: 9999,
+                            fontSize: 16,
+                            fontWeight: 700,
+                            color: scoreStyle.color,
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: 9999,
+                              background: scoreStyle.color,
+                            }}
+                          />
+                          {ecoScore}
+                        </span>
+                      </div>
+            
+                      {/* Desktop Chevron */}
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <FaChevronRight size={10} color="#404940" />
+                      </div>
+                    </>
+                  )}
                 </div>
               );
-            })
-          )}
+            }))}
 
           {/* Pagination */}
           <div
