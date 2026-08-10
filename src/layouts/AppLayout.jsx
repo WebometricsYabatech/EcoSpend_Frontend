@@ -8,65 +8,100 @@ export default function AppLayout() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
     window.addEventListener("resize", handleResize);
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-
-      {/* Desktop sidebar — static, always visible on desktop */}
+    <div
+      style={{
+        display: "flex",
+        minHeight: "100vh",
+        width: "100%",
+        overflowX: "hidden",
+      }}
+    >
+      {/* Desktop sidebar */}
       {isDesktop && (
-        <aside style={{
-          width: 256,
-          flexShrink: 0,
-          minHeight: "100vh",
-          background: "#F2F4F6",
-          borderRight: "1px solid #BFC9BD",
-          padding: 16,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          boxSizing: "border-box",
-        }}>
+        <aside
+          style={{
+            width: 256,
+            flexShrink: 0,
+            minHeight: "100vh",
+            background: "#F2F4F6",
+            borderRight: "1px solid #BFC9BD",
+            padding: 16,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            boxSizing: "border-box",
+          }}
+        >
           <NavBar navOpen={true} onClose={() => {}} />
         </aside>
       )}
 
       {/* Mobile sliding sidebar */}
       {!isDesktop && (
-        <NavBar navOpen={navOpen} onClose={() => setNavOpen(false)} />
+        <NavBar
+          navOpen={navOpen}
+          onClose={() => setNavOpen(false)}
+        />
       )}
 
       {/* Main content */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
+          width: "100%",
+        }}
+      >
         {/* Mobile top bar */}
         {!isDesktop && (
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "12px 16px",
-            background: "#F2F4F6",
-            borderBottom: "1px solid #BFC9BD",
-            position: "sticky",
-            top: 0,
-            zIndex: 100,
-          }}>
-            <h1 style={{
-              fontFamily: "Inter", fontSize: 18,
-              fontWeight: 700, color: "#004C22", margin: 0,
-            }}>
+          <div
+            style={{
+              height: 56,
+              boxSizing: "border-box",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "12px 16px",
+              background: "#F2F4F6",
+              borderBottom: "1px solid #BFC9BD",
+              position: "sticky",
+              top: 0,
+              zIndex: 100,
+            }}
+          >
+            <h1
+              style={{
+                fontFamily: "Inter",
+                fontSize: 18,
+                fontWeight: 700,
+                color: "#004C22",
+                margin: 0,
+              }}
+            >
               EcoSpend
             </h1>
+
             <button
               onClick={() => setNavOpen(true)}
               style={{
-                background: "none", border: "none",
-                cursor: "pointer", padding: 8,
-                display: "flex", alignItems: "center",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: 8,
+                display: "flex",
+                alignItems: "center",
               }}
             >
               <FaBars size={22} color="#004C22" />
@@ -74,7 +109,14 @@ export default function AppLayout() {
           </div>
         )}
 
-        <main style={{ flex: 1 }}>
+        <main
+          style={{
+            flex: 1,
+            minWidth: 0,
+            width: "100%",
+            boxSizing: "border-box",
+          }}
+        >
           <Outlet />
         </main>
       </div>
