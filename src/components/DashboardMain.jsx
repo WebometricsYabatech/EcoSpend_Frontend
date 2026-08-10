@@ -10,6 +10,29 @@ import {
 import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
 import { getDashboard } from "../api";
 
+const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth < 768);
+  };
+
+  window.addEventListener("resize", handleResize);
+
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+<div
+  style={{
+    maxWidth: 1200,
+    width: "100%",
+    boxSizing: "border-box",
+    margin: "0 auto",
+    padding: isMobile
+      ? "24px 16px 32px"
+      : "40px 40px 48px",
+    fontFamily: "Inter, sans-serif",
+  }}
+></div>
 // ── CATEGORY STYLES ──
 const CATEGORY_STYLES = {
   FOOD: { bg: "#6BFF8F", color: "#007432" },
@@ -268,10 +291,25 @@ export default function DashboardMain() {
       ) : (
 
         /* ── ACTIVE STATE ── */
-        <div style={{ display: "flex", gap: 24 }}>
+        <div
+        style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+         gap: 24,
+         width: "100%",
+         }}
+        >
 
           {/* ── LEFT COLUMN ── */}
-          <div style={{ width: 280, flexShrink: 0, display: "flex", flexDirection: "column", gap: 16 }}>
+          <div
+         style={{
+          width: isMobile ? "100%" : 280,
+          flexShrink: 0,
+         display: "flex",
+          flexDirection: "column",
+         gap: 16,
+         }}
+         >
 
             {/* Eco Score */}
             <div style={{ background: "white", borderRadius: 12, padding: 24, boxShadow: "0px 1px 2px rgba(0,0,0,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -359,7 +397,16 @@ export default function DashboardMain() {
           </div>
 
           {/* ── RIGHT COLUMN ── */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 24 }}>
+          <div
+          style={{
+         flex: 1,
+          minWidth: 0,
+          width: isMobile ? "100%" : "auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: 24,
+         }}
+         >
 
             {/* Recent Receipts */}
             <div style={{ background: "white", borderRadius: 12, boxShadow: "0px 1px 2px rgba(0,0,0,0.05)", overflow: "hidden" }}>
