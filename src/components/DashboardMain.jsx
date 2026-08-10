@@ -227,10 +227,34 @@ export default function DashboardMain() {
       {/* ── EMPTY STATE ── */}
       {!hasData ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div style={{ display: "flex", flexDirection: "row", gap: 24, alignItems: "stretch", flexWrap: "wrap" }}>
+          <div
+        style={{
+       display: "flex",
+       flexDirection: isMobile ? "column" : "row",
+       gap: 24,
+       alignItems: "stretch",
+       width: "100%",
+       }}
+      >
 
             {/* Eco Score — empty */}
-            <div style={{ maxWidth: 400, background: "white", borderRadius: 12, padding: 24, boxShadow: "0px 4px 20px rgba(0,0,0,0.05)", minHeight: 320, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
+            <div
+           style={{
+           width: "100%",
+           maxWidth: isMobile ? "none" : 400,
+           background: "white",
+           borderRadius: 12,
+           padding: 24,
+           boxShadow: "0px 4px 20px rgba(0,0,0,0.05)",
+           minHeight: 320,
+           boxSizing: "border-box",
+           display: "flex",
+           flexDirection: "column",
+           alignItems: "center",
+           justifyContent: "center",
+           gap: 16,
+           }}
+          >
               <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "#404940", textAlign: "center" }}>Your Eco-Score</p>
               <div style={{ position: "relative", width: 192, height: 192, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width={192} height={192}>
@@ -242,7 +266,8 @@ export default function DashboardMain() {
             </div>
 
             {/* Spending Overview — empty */}
-            <div style={{ flex: 1, background: "white", borderRadius: 12, padding: 24, boxShadow: "0px 4px 20px rgba(0,0,0,0.05)", minHeight: 320, display: "flex", flexDirection: "column", gap: 24 }}>
+            <div style={{ flex: 1, background: "white", borderRadius: 12, padding: 24, boxShadow: "0px 4px 20px rgba(0,0,0,0.05)", minHeight: 320, display: "flex", flexDirection: "column", gap: 24,width: "100%",
+            boxSizing: "border-box", }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h2 style={{ margin: 0, fontFamily: "inter", fontSize: 20, fontWeight: 600, color: "#191C1E" }}>Spending Overview</h2>
                 <div style={{ width: 96, height: 32, background: "#ECEEF0", borderRadius: 8, opacity: 0.5 }} />
@@ -446,7 +471,11 @@ export default function DashboardMain() {
                 return (
                   <div
                     key={i}
-                    onClick={() => navigate(`/ReviewDetails/${receiptData.receiptId}`, { state: { confirmedData: r } })}
+                    onClick={() =>
+                      navigate(`/ReviewDetails/${r.receiptId}`, {
+                        state: { confirmedData: r },
+                      })
+                    }
                     style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.5fr 1.5fr 1fr", padding: "0 24px", borderTop: i === 0 ? "none" : "1px solid #BFC9BD", alignItems: "center", cursor: "pointer" }}
                     onMouseEnter={(e) => e.currentTarget.style.background = "#F7F9FB"}
                     onMouseLeave={(e) => e.currentTarget.style.background = "white"}
