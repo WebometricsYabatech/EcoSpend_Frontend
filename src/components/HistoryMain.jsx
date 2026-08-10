@@ -112,32 +112,37 @@ export default function ReceiptHistory() {
   );
 
   const handleRowClick = (receipt) => {
-    const rawScore = Number(receipt.sustainabilityScore ?? 0);
-    const ecoScore = rawScore <= 10 ? rawScore * 10 : rawScore;
-  
-    navigate(`/ReviewDetails/${receipt.receiptId}`, {
-      state: {
-        confirmedData: {
-          receiptId: receipt.receiptId,
-          store: receipt.storeName,
-          date: receipt.date,
-          total: Number(receipt.totalAmount),
-          ecoScore,
-          ecoLabel:
-            ecoScore >= 70
-              ? "High Impact"
-              : ecoScore >= 40
-              ? "Medium Impact"
-              : "Low Impact",
-          ecoMessage: "",
-          goalProgress: 78,
-          goalMessage: "",
-          location: "",
-          items: receipt.items || [],
-          category: receipt.category,
-        },
-      },
-    });
+    const rawEcoScore = receipt.sustainabilityScore ?? 0;
+
+const ecoScorePercentage =
+  rawEcoScore <= 10 ? rawEcoScore * 10 : rawEcoScore;
+
+navigate(`/ReviewDetails/${receipt.receiptId}`, {
+  state: {
+    confirmedData: {
+      receiptId: receipt.receiptId,
+      store: receipt.storeName,
+      date: receipt.date,
+      total: Number(receipt.totalAmount),
+      ecoScore: ecoScorePercentage,
+      sustainabilityScore: rawEcoScore,
+
+      ecoLabel:
+        ecoScorePercentage >= 70
+          ? "High Impact"
+          : ecoScorePercentage >= 40
+          ? "Medium Impact"
+          : "Low Impact",
+
+      ecoMessage: "",
+      goalProgress: 78,
+      goalMessage: "",
+      location: "",
+      items: receipt.items || [],
+      category: receipt.category,
+    },
+  },
+});
   };
 
   return (

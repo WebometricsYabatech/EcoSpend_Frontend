@@ -52,12 +52,18 @@ export default function ReceiptDetails() {
     );
   }
 
-  const items = receiptData.items || [];
-  const visibleItems = showAllItems ? items : items.slice(0, 4);
-  const ecoScorePercentage = receiptData.ecoScore ?? receiptData.sustainabilityScore ?? 0;
-  const radius = 28;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDash = (ecoScorePercentage / 100) * circumference;
+  // Backend sustainabilityScore is currently on a 0–10 scale.
+// Convert it to 0–100 for display.
+const rawEcoScore =
+receiptData.ecoScore ?? receiptData.sustainabilityScore ?? 0;
+
+const ecoScorePercentage =
+rawEcoScore <= 10 ? rawEcoScore * 10 : rawEcoScore;
+
+const radius = 28;
+const circumference = 2 * Math.PI * radius;
+const strokeDash =
+(Math.min(Math.max(ecoScorePercentage, 0), 100) / 100) * circumference;
 
   return (
     <div style={{
