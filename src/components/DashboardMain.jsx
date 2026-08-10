@@ -143,49 +143,59 @@ function EcoScoreLineChart({ data }) {
 
 export default function DashboardMain() {
   const navigate = useNavigate();
+
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(
+    window.innerWidth < 768
+  );
 
   useEffect(() => {
     getDashboard()
-  .then((data) => {
-    console.log("DASHBOARD RESPONSE:", JSON.stringify(data, null, 2));
-    setDashboardData(data);
-  })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .then((data) => {
+        console.log(
+          "DASHBOARD RESPONSE:",
+          JSON.stringify(data, null, 2)
+        );
+        setDashboardData(data);
+      })
+      .catch((error) => {
+        console.error("Dashboard error:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
-
-  if (loading) {
-    return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
-        <p style={{ color: "#404940", fontSize: 16 }}>Loading dashboard...</p>
-      </div>
-    );
-  }
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
-  
+
     window.addEventListener("resize", handleResize);
-  
-    return () => window.removeEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
-  <div
-    style={{
-      maxWidth: 1200,
-      width: "100%",
-      boxSizing: "border-box",
-      margin: "0 auto",
-      padding: isMobile
-        ? "24px 16px 32px"
-        : "40px 40px 48px",
-      fontFamily: "Inter, sans-serif",
-    }}
-  ></div>
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "60vh",
+        }}
+      >
+        <p style={{ color: "#404940", fontSize: 16 }}>
+          Loading dashboard...
+        </p>
+      </div>
+    );
+  }
+
   // ── DERIVE VALUES FROM BACKEND RESPONSE ──
   const overview = dashboardData?.overview || {};
   const categoryBreakdown = dashboardData?.categoryBreakdown || [];
