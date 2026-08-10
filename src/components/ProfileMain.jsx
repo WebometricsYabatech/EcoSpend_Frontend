@@ -467,7 +467,14 @@ useEffect(() => {
 >
 
           {/* Avatar + title */}
-          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+          <div
+         style={{
+         display: "flex",
+         flexDirection: isMobile ? "column" : "row",
+         alignItems: isMobile ? "flex-start" : "center",
+         gap: 16,
+         }}
+         >
             <div style={{ position: "relative" }}>
               <div style={{ width: 160, height: 160, borderRadius: 9999, overflow: "hidden", outline: "4px solid white", boxShadow: "0px 4px 20px rgba(0,0,0,0.05)", background: "#E6E8EA", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {avatarUrl ? (
