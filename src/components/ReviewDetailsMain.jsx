@@ -62,8 +62,9 @@ export default function ReceiptDetails() {
   return (
     <div style={{
       maxWidth: 1100, margin: "0 auto",
-      padding: isMobile ? "80px 16px 32px" : "96px 40px 48px",
+      padding: isMobile ? "24px 16px 32px" : "40px 40px 48px",
       fontFamily: "Inter",
+      flexDirection: isMobile ? "column" : "row"
     }}>
 
       {/* ── HEADER ── */}
