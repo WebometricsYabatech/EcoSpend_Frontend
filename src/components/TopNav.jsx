@@ -44,7 +44,7 @@ export default function TopNavbar() {
               <img
                 src={avatarUrl}
                 alt="avatar"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                className="h-10 w-10 object-cover"
                 onError={() => {
                   setAvatarUrl(null);
                   localStorage.removeItem("avatarUrl");
