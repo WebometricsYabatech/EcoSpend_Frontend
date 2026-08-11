@@ -14,6 +14,7 @@ import {
   exportData,
   deleteAllReceipts,
 } from "../api";
+import { getCurrency, setCurrency } from "../utils/currency";
 
 // ── TOGGLE ──
 function Toggle({ checked, onChange }) {
@@ -341,6 +342,7 @@ export default function ProfileSettings() {
   const passwordMismatch = confirmPassword.length > 0 && newPassword !== confirmPassword;
   const passwordMatch = confirmPassword.length > 0 && newPassword === confirmPassword;
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [currency, setCurrencyState] = useState(getCurrency());
 
 useEffect(() => {
   const handleResize = () => {
@@ -630,7 +632,74 @@ useEffect(() => {
             <h1 style={{ margin: "0 0 4px", fontFamily: "inter", fontSize: 32, fontWeight: 700, color: "#004C22" }}>Settings</h1>
             <p style={{ margin: 0, fontSize: 16, color: "#404940", lineHeight: "24px" }}>Customize your experience and manage data.</p>
           </div>
+           
+           {/* Currency */}
+<div
+  style={{
+    background: "white",
+    borderRadius: 12,
+    boxShadow: "0px 4px 20px rgba(0,0,0,0.05)",
+    padding: 24,
+    display: "flex",
+    flexDirection: "column",
+    gap: 16,
+  }}
+>
+  <div>
+    <h2
+      style={{
+        margin: 0,
+        fontFamily: "inter",
+        fontSize: 20,
+        fontWeight: 600,
+        color: "#004C22",
+      }}
+    >
+      Currency
+    </h2>
 
+    <p
+      style={{
+        margin: "4px 0 0",
+        fontSize: 14,
+        color: "#404940",
+        lineHeight: "20px",
+      }}
+    >
+      Choose the currency used across your EcoSpend account.
+    </p>
+  </div>
+
+  <select
+    value={currency}
+    onChange={(e) => {
+      const newCurrency = e.target.value;
+    
+      setCurrencyState(newCurrency);
+      setCurrency(newCurrency);
+    
+      window.dispatchEvent(
+        new CustomEvent("currencyUpdated", {
+          detail: newCurrency,
+        })
+      );
+    }}
+    style={{
+      width: "100%",
+      padding: "12px 16px",
+      borderRadius: 8,
+      border: "1px solid #BFC9BD",
+      background: "#F2F4F6",
+      color: "#191C1E",
+      fontSize: 16,
+      outline: "none",
+      cursor: "pointer",
+    }}
+  >
+    <option value="NGN">₦ Nigerian Naira (NGN)</option>
+    <option value="USD">$ US Dollar (USD)</option>
+  </select>
+</div>
           {/* Data & Privacy */}
           <div style={{ background: "white", borderRadius: 12, boxShadow: "0px 4px 20px rgba(0,0,0,0.05)", padding: 24, display: "flex", flexDirection: "column", gap: 24 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

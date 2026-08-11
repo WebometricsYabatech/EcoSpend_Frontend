@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
 import { getDashboard } from "../api";
-
+import { formatCurrency } from "../utils/currency";
 // ── CATEGORY STYLES ──
 const CATEGORY_STYLES = {
   FOOD: { bg: "#6BFF8F", color: "#007432" },
@@ -80,7 +80,7 @@ function DonutChart({ data, total }) {
 }
 
 // ── LINE CHART ──
-function EcoScoreLineChart({ data }) {
+function SpendingLineChart({ data }) {
   const width = 500;
   const height = 220;
   const padding = { top: 20, right: 20, bottom: 30, left: 30 };
@@ -219,7 +219,7 @@ export default function DashboardMain() {
     percent: cat.percentage ?? cat.percent ?? 0,
   }));
 
-  const totalFormatted = `$${totalSpent.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const totalFormatted = formatCurrency(totalSpent);
 
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: "96px 40px 48px", fontFamily: "Inter, sans-serif" }}>
@@ -466,8 +466,9 @@ export default function DashboardMain() {
                 const storeName = r.merchant || r.store || r.name || "Unknown";
                 const initials = storeName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
                 const date = r.date ? new Date(r.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
-                const total = r.amount != null ? `$${Number(r.amount).toFixed(2)}` : r.total || "—";
-
+                const total = r.amount != null
+               ? formatCurrency(Number(r.amount))
+                : r.total || "—";
                 return (
                   <div
                     key={i}

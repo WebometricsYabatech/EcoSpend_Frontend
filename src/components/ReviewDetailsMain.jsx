@@ -6,6 +6,7 @@ import {
   FaEdit, FaChevronRight, FaExpand, FaCompress,
 } from "react-icons/fa";
 
+
 const getImpactColor = (grade) => {
   if (!grade) return "#404940";
   if (grade.startsWith("A")) return "#006E2F";
