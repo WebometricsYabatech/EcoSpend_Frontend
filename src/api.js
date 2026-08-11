@@ -385,7 +385,7 @@ export async function createCategory(category) {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      category,
+      name: category,
     }),
   });
 
