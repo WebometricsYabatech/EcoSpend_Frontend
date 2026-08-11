@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import AIicon from "../assets/AI-iconGreen.svg";
-import { confirmReceipt, createCategory } from "../api";
+import { confirmReceipt, createCategory, getCategories } from "../api";
 
 const CATEGORY_OPTIONS = [
   "Groceries", "Food & Dining", "Transport", "Utilities",
@@ -24,6 +24,8 @@ export default function ReviewReceipt() {
     return () => window.removeEventListener("resize", handle);
   }, []);
 
+  
+  
   const scannedData = location.state?.receiptData || {
     store: "", date: "", total: 0,
     sustainabilityScore: 0, sustainabilityTip: "", items: [],
@@ -43,7 +45,30 @@ export default function ReviewReceipt() {
  const [isSavingCategory, setIsSavingCategory] = useState(false);
  const [userCategories, setUserCategories] = useState(CATEGORY_OPTIONS);
  const [activeItemIndex, setActiveItemIndex] = useState(null);
- 
+ useEffect(() => {
+  const loadCategories = async () => {
+    try {
+      const data = await getCategories();
+
+      const categories = Array.isArray(data)
+        ? data
+        : data.categories || [];
+
+      setUserCategories([
+        ...CATEGORY_OPTIONS,
+        ...categories
+          .map((category) => category.name)
+          .filter(
+            (name) => !CATEGORY_OPTIONS.includes(name)
+          ),
+      ]);
+    } catch (error) {
+      console.error("Failed to load categories:", error);
+    }
+  };
+
+  loadCategories();
+}, []);
  
 
  const addItem = () => setItems([...items, { ...EMPTY_ITEM }]);
@@ -56,10 +81,10 @@ export default function ReviewReceipt() {
   };
   setItems(updated);
 };
- const handleCategoryChange = (index, value) => {
+const handleCategoryChange = (index, value) => {
   if (value === "Other") {
     setActiveItemIndex(index);
-    setCustomCategory("");
+    setNewCategory("");
     setShowCategoryPopup(true);
     return;
   }
@@ -74,70 +99,69 @@ const saveCustomCategory = async () => {
   try {
     setIsSavingCategory(true);
 
-    // Save category to user's account
     const savedCategory = await createCategory(categoryName);
 
     console.log("Category saved:", savedCategory);
 
-    const savedName = savedCategory?.category || categoryName;
+    const createdCategory = savedCategory.category || savedCategory;
 
-    // Add it to the dropdown immediately
-    setUserCategories((prev) => {
-      if (prev.includes(savedName)) {
-        return prev;
-      }
+    // Add the new category to the dropdown
+    setUserCategories((prev) => [
+      ...prev,
+      createdCategory.name,
+    ]);
 
-      return [...prev.filter((cat) => cat !== "Other"), savedName, "Other"];
-    });
+    // Apply the new category to the current item
+    handleItemChange(
+      activeItemIndex,
+      "category",
+      createdCategory.name
+    );
 
-    // Apply it to the item that selected "Other"
-    if (activeItemIndex !== null) {
-      handleItemChange(
-        activeItemIndex,
-        "category",
-        savedName
-      );
-    }
-
-    // Close popup
     setShowCategoryPopup(false);
     setNewCategory("");
     setActiveItemIndex(null);
 
   } catch (error) {
     console.error("Failed to save category:", error);
-    alert("Failed to save category. Please try again.");
+    alert(error.message || "Failed to save category. Please try again.");
   } finally {
     setIsSavingCategory(false);
   }
 };
- 
- const handleConfirm = async () => {
-    setIsSaving(true);
-    setError("");
-    try {
-      const receiptData = {
-        store, date,
-        total: Number(total),
-        items: items.map(item => ({ ...item, price: Number(item.price) })),
-      };
-      const response = await confirmReceipt(receiptData);
-      navigate(`/ReviewDetails/${receiptData.receiptId}`, {
-        state: {
-          receiptData: {
-            ...receiptData,
-            sustainabilityScore,
-            sustainabilityTip,
-            receiptImage: scannedData.receiptImage,
-          },
+const handleConfirm = async () => {
+  setIsSaving(true);
+  setError("");
+
+  try {
+    const receiptData = {
+      store,
+      date,
+      total: Number(total),
+      items: items.map((item) => ({
+        ...item,
+        price: Number(item.price),
+      })),
+    };
+
+    const response = await confirmReceipt(receiptData);
+
+    navigate(`/ReviewDetails/${response.receiptId}`, {
+      state: {
+        receiptData: {
+          ...receiptData,
+          sustainabilityScore,
+          sustainabilityTip,
+          receiptImage: scannedData.receiptImage,
         },
-      });
-    } catch (err) {
-      setError(err.message || "Failed to confirm receipt.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
+      },
+    });
+  } catch (err) {
+    setError(err.message || "Failed to confirm receipt.");
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const handleCancel = () => navigate(-1);
 
