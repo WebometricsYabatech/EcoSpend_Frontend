@@ -373,26 +373,76 @@ export async function getReceiptHistory() {
 
   return data;
 }
-export const createCategory = async (category) => {
-  const response = await api.post("/api/categories", {
-    category,
+// ── CATEGORIES ──
+
+export async function createCategory(category) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${BASE_URL}/api/categories`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      category,
+    }),
   });
 
-  return response.data;
-};
+  const data = await response.json();
 
-// Update an existing category
-export const updateCategory = async (id, category) => {
-  const response = await api.put(`/api/categories/${id}`, {
-    category,
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to create category.");
+  }
+
+  return data;
+}
+
+export async function updateCategory(id, category) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${BASE_URL}/api/categories/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      category,
+    }),
   });
 
-  return response.data;
-};
-export const updateCurrency = async (currency) => {
-  const response = await api.put("/api/profile/currency", {
-    currency,
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update category.");
+  }
+
+  return data;
+}
+
+
+// ── CURRENCY ──
+
+export async function updateCurrency(currency) {
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${BASE_URL}/api/profile/currency`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      currency,
+    }),
   });
 
-  return response.data;
-};
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update currency.");
+  }
+
+  return data;
+}
