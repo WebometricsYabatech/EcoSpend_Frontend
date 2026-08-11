@@ -15,6 +15,7 @@ import {
   deleteAllReceipts,
 } from "../api";
 import { getCurrency, setCurrency } from "../utils/currency";
+import { updateCurrency } from "../api";
 
 // ── TOGGLE ──
 function Toggle({ checked, onChange }) {
@@ -671,34 +672,45 @@ useEffect(() => {
   </div>
 
   <select
-    value={currency}
-    onChange={(e) => {
-      const newCurrency = e.target.value;
-    
+  value={currency}
+  onChange={async (e) => {
+    const newCurrency = e.target.value;
+
+    try {
+      await updateCurrency(newCurrency);
+
       setCurrencyState(newCurrency);
       setCurrency(newCurrency);
-    
+
       window.dispatchEvent(
         new CustomEvent("currencyUpdated", {
           detail: newCurrency,
         })
       );
-    }}
-    style={{
-      width: "100%",
-      padding: "12px 16px",
-      borderRadius: 8,
-      border: "1px solid #BFC9BD",
-      background: "#F2F4F6",
-      color: "#191C1E",
-      fontSize: 16,
-      outline: "none",
-      cursor: "pointer",
-    }}
-  >
-    <option value="NGN">₦ Nigerian Naira (NGN)</option>
-    <option value="USD">$ US Dollar (USD)</option>
-  </select>
+    } catch (err) {
+      console.error("Failed to update currency:", err);
+    }
+  }}
+  style={{
+    width: "100%",
+    padding: "12px 16px",
+    borderRadius: 8,
+    border: "1px solid #BFC9BD",
+    background: "#F2F4F6",
+    color: "#191C1E",
+    fontSize: 16,
+    outline: "none",
+    cursor: "pointer",
+  }}
+>
+  <option value="NGN">₦ Nigerian Naira (NGN)</option>
+  <option value="USD">$ US Dollar (USD)</option>
+  <option value="GBP">£ British Pound (GBP)</option>
+  <option value="EUR">€ Euro (EUR)</option>
+  <option value="GHS">₵ Ghanaian Cedi (GHS)</option>
+  <option value="KES">KSh Kenyan Shilling (KES)</option>
+  <option value="ZAR">R South African Rand (ZAR)</option>
+</select>
 </div>
           {/* Data & Privacy */}
           <div style={{ background: "white", borderRadius: 12, boxShadow: "0px 4px 20px rgba(0,0,0,0.05)", padding: 24, display: "flex", flexDirection: "column", gap: 24 }}>

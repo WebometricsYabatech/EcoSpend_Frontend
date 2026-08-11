@@ -388,3 +388,26 @@ export async function getReceiptHistory() {
 
   return data;
 }
+export const createCategory = async (category) => {
+  const response = await API.post("/api/categories", {
+    category,
+  });
+
+  return response.data;
+};
+
+// Update an existing category
+export const updateCategory = async (id, category) => {
+  const response = await API.put(`/api/categories/${id}`, {
+    category,
+  });
+
+  return response.data;
+};
+export const updateCurrency = async (currency) => {
+  const response = await API.put("/api/profile/currency", {
+    currency,
+  });
+
+  return response.data;
+};

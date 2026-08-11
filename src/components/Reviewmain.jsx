@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import AIicon from "../assets/AI-iconGreen.svg";
-import { confirmReceipt } from "../api";
+import { confirmReceipt, createCategory } from "../api";
 
 const CATEGORY_OPTIONS = [
   "Groceries", "Food & Dining", "Transport", "Utilities",
@@ -12,6 +12,134 @@ const CATEGORY_OPTIONS = [
 ];
 
 const EMPTY_ITEM = { name: "", price: "", category: "Groceries" };
+{showCategoryPopup && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0, 0, 0, 0.45)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+      padding: 20,
+    }}
+  >
+    <div
+      style={{
+        width: "100%",
+        maxWidth: 420,
+        background: "white",
+        borderRadius: 16,
+        padding: 28,
+        boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
+      }}
+    >
+      <h2
+        style={{
+          margin: "0 0 8px",
+          fontSize: 22,
+          fontWeight: 700,
+          color: "#191C1E",
+        }}
+      >
+        Create a category
+      </h2>
+
+      <p
+        style={{
+          margin: "0 0 20px",
+          fontSize: 14,
+          color: "#404940",
+          lineHeight: "20px",
+        }}
+      >
+        Add a category to your personal categories.
+      </p>
+
+      <label
+        style={{
+          display: "block",
+          marginBottom: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          color: "#191C1E",
+        }}
+      >
+        Category name
+      </label>
+
+      <input
+        type="text"
+        value={newCategory}
+        onChange={(e) => setNewCategory(e.target.value)}
+        placeholder="e.g. Pet Care"
+        autoFocus
+        style={{
+          width: "100%",
+          boxSizing: "border-box",
+          padding: "12px 14px",
+          borderRadius: 8,
+          border: "1px solid #BFC9BD",
+          outline: "none",
+          fontSize: 14,
+          color: "#191C1E",
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 10,
+          marginTop: 20,
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => {
+            setShowCategoryPopup(false);
+            setNewCategory("");
+          }}
+          style={{
+            padding: "10px 18px",
+            borderRadius: 8,
+            border: "1px solid #BFC9BD",
+            background: "white",
+            color: "#404940",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          disabled={!newCategory.trim() || isSavingCategory}
+          style={{
+            padding: "10px 18px",
+            borderRadius: 8,
+            border: "none",
+            background: "#004C22",
+            color: "white",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor:
+              !newCategory.trim() || isSavingCategory
+                ? "not-allowed"
+                : "pointer",
+            opacity:
+              !newCategory.trim() || isSavingCategory ? 0.6 : 1,
+          }}
+        >
+          {isSavingCategory ? "Saving..." : "Save Category"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
 export default function ReviewReceipt() {
   const navigate = useNavigate();
@@ -35,20 +163,60 @@ export default function ReviewReceipt() {
   const [items, setItems] = useState(scannedData.items || []);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-
   const receiptImage = scannedData.receiptImage;
   const sustainabilityScore = scannedData.sustainabilityScore;
   const sustainabilityTip = scannedData.sustainabilityTip;
+  const [showCategoryPopup, setShowCategoryPopup] = useState(false);
+ const [newCategory, setNewCategory] = useState("");
+ const [isSavingCategory, setIsSavingCategory] = useState(false);
+ const [userCategories, setUserCategories] = useState(CATEGORY_OPTIONS);
+ 
 
-  const handleItemChange = (index, field, value) => {
-    const updated = [...items];
-    updated[index] = { ...updated[index], [field]: value };
-    setItems(updated);
-  };
+ const addItem = () => setItems([...items, { ...EMPTY_ITEM }]);
+ const handleCategoryChange = (index, value) => {
+  if (value === "Other") {
+    setActiveItemIndex(index);
+    setCustomCategory("");
+    setShowCategoryPopup(true);
+    return;
+  }
 
-  const addItem = () => setItems([...items, { ...EMPTY_ITEM }]);
+  handleItemChange(index, "category", value);
+};
+const saveCustomCategory = async () => {
+  const categoryName = newCategory.trim();
 
-  const handleConfirm = async () => {
+  if (!categoryName) return;
+
+  try {
+    setIsSavingCategory(true);
+
+    // Save category to the user's account
+    const savedCategory = await createCategory(categoryName);
+
+    console.log("Category saved:", savedCategory);
+
+    // Apply the new category to the item
+    handleItemChange(
+      activeItemIndex,
+      "category",
+      savedCategory.category || categoryName
+    );
+
+    // Close popup
+    setShowCategoryPopup(false);
+    setNewCategory("");
+    setActiveItemIndex(null);
+
+  } catch (error) {
+    console.error("Failed to save category:", error);
+    alert("Failed to save category. Please try again.");
+  } finally {
+    setIsSavingCategory(false);
+  }
+};
+ 
+ const handleConfirm = async () => {
     setIsSaving(true);
     setError("");
     try {
@@ -266,19 +434,26 @@ export default function ReviewReceipt() {
                     }}
                   />
                   <select
-                    value={item.category}
-                    onChange={(e) => handleItemChange(index, "category", e.target.value)}
-                    style={{
-                      padding: "10px 14px", borderRadius: 8,
-                      border: "1px solid #BFC9BD",
-                      fontSize: 14, color: "#191C1E",
-                      outline: "none", background: "white", cursor: "pointer",
-                    }}
+                 value={item.category}
+                 onChange={(e) => {
+                 const value = e.target.value;
+
+                if (value === "Other") {
+                 setActiveItemIndex(index);
+                 setNewCategory("");
+                 setShowCategoryPopup(true);
+                  return;
+                 }
+
+                 handleItemChange(index, "category", value);
+                 }}
                   >
-                    {CATEGORY_OPTIONS.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))}
-                  </select>
+                 {userCategories.map((cat) => (
+                   <option key={cat} value={cat}>
+                {cat}
+                </option>
+               ))}
+               </select>
                 </div>
               ))}
             </div>
