@@ -53,7 +53,13 @@ export default function NavBar() {
   };
 
   const sidebarContent = (
-    <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100%" }}>
+    <div
+  style={{
+    flex: 1,
+    minHeight: 0,
+    overflow: "hidden",
+  }}
+>
       <div>
         {/* Logo + close button */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 24 }}>
@@ -174,15 +180,20 @@ export default function NavBar() {
   // ── DESKTOP: static sidebar ──
   if (isDesktop) {
     return (
-      <aside style={{
-        width: 256,
-        minHeight: "100vh",
-        flexShrink: 0,
-        background: "#F2F4F6",
-        borderRight: "1px solid #BFC9BD",
-        padding: 16,
-        boxSizing: "border-box",
-      }}>
+      <aside
+        style={{
+          width: 256,
+          height: "100vh",
+          flexShrink: 0,
+          background: "#F2F4F6",
+          borderRight: "1px solid #BFC9BD",
+          padding: 16,
+          boxSizing: "border-box",
+          overflow: "hidden",
+          position: "sticky",
+          top: 0,
+        }}
+      >
         {sidebarContent}
       </aside>
     );
