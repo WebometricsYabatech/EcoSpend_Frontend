@@ -460,15 +460,44 @@ export default function DashboardMain() {
 
               {/* Table rows */}
               {recentReceipts.map((r, i) => {
-                const category = (r.category || r.categoryName || "OTHER").toUpperCase();
-                const catStyle = CATEGORY_STYLES[category] || CATEGORY_STYLES.OTHER;
-                const score = r.sustainabilityScore ?? r.ecoScore ?? null;
-                const storeName = r.merchant || r.store || r.name || "Unknown";
-                const initials = storeName.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
-                const date = r.date ? new Date(r.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—";
-                const total = r.amount != null
-               ? formatCurrency(Number(r.amount))
-                : r.total || "—";
+  const category = (r.category || r.categoryName || "OTHER").toUpperCase();
+  const catStyle = CATEGORY_STYLES[category] || CATEGORY_STYLES.OTHER;
+
+  // Individual receipt score
+  const score = r.sustainabilityScore ?? r.ecoScore ?? null;
+
+  // Backend returns storeName
+  const storeName =
+    r.storeName ||
+    r.merchant ||
+    r.store ||
+    r.name ||
+    "Unknown";
+
+  const initials = storeName
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const date = r.date
+    ? new Date(r.date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "—";
+
+  // Backend returns totalAmount
+  const total =
+    r.totalAmount != null
+      ? formatCurrency(Number(r.totalAmount))
+      : r.amount != null
+        ? formatCurrency(Number(r.amount))
+        : r.total != null
+          ? formatCurrency(Number(r.total))
+          : "—";
                 return (
                   <div
                     key={i}
