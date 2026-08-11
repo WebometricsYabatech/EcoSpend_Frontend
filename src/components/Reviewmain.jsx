@@ -12,134 +12,6 @@ const CATEGORY_OPTIONS = [
 ];
 
 const EMPTY_ITEM = { name: "", price: "", category: "Groceries" };
-{showCategoryPopup && (
-  <div
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(0, 0, 0, 0.45)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1000,
-      padding: 20,
-    }}
-  >
-    <div
-      style={{
-        width: "100%",
-        maxWidth: 420,
-        background: "white",
-        borderRadius: 16,
-        padding: 28,
-        boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
-      }}
-    >
-      <h2
-        style={{
-          margin: "0 0 8px",
-          fontSize: 22,
-          fontWeight: 700,
-          color: "#191C1E",
-        }}
-      >
-        Create a category
-      </h2>
-
-      <p
-        style={{
-          margin: "0 0 20px",
-          fontSize: 14,
-          color: "#404940",
-          lineHeight: "20px",
-        }}
-      >
-        Add a category to your personal categories.
-      </p>
-
-      <label
-        style={{
-          display: "block",
-          marginBottom: 8,
-          fontSize: 14,
-          fontWeight: 600,
-          color: "#191C1E",
-        }}
-      >
-        Category name
-      </label>
-
-      <input
-        type="text"
-        value={newCategory}
-        onChange={(e) => setNewCategory(e.target.value)}
-        placeholder="e.g. Pet Care"
-        autoFocus
-        style={{
-          width: "100%",
-          boxSizing: "border-box",
-          padding: "12px 14px",
-          borderRadius: 8,
-          border: "1px solid #BFC9BD",
-          outline: "none",
-          fontSize: 14,
-          color: "#191C1E",
-        }}
-      />
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          gap: 10,
-          marginTop: 20,
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            setShowCategoryPopup(false);
-            setNewCategory("");
-          }}
-          style={{
-            padding: "10px 18px",
-            borderRadius: 8,
-            border: "1px solid #BFC9BD",
-            background: "white",
-            color: "#404940",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
-          Cancel
-        </button>
-
-        <button
-          type="button"
-          disabled={!newCategory.trim() || isSavingCategory}
-          style={{
-            padding: "10px 18px",
-            borderRadius: 8,
-            border: "none",
-            background: "#004C22",
-            color: "white",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor:
-              !newCategory.trim() || isSavingCategory
-                ? "not-allowed"
-                : "pointer",
-            opacity:
-              !newCategory.trim() || isSavingCategory ? 0.6 : 1,
-          }}
-        >
-          {isSavingCategory ? "Saving..." : "Save Category"}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
 
 export default function ReviewReceipt() {
   const navigate = useNavigate();
@@ -170,6 +42,7 @@ export default function ReviewReceipt() {
  const [newCategory, setNewCategory] = useState("");
  const [isSavingCategory, setIsSavingCategory] = useState(false);
  const [userCategories, setUserCategories] = useState(CATEGORY_OPTIONS);
+ const [activeItemIndex, setActiveItemIndex] = useState(null);
  
 
  const addItem = () => setItems([...items, { ...EMPTY_ITEM }]);
@@ -191,17 +64,30 @@ const saveCustomCategory = async () => {
   try {
     setIsSavingCategory(true);
 
-    // Save category to the user's account
+    // Save category to user's account
     const savedCategory = await createCategory(categoryName);
 
     console.log("Category saved:", savedCategory);
 
-    // Apply the new category to the item
-    handleItemChange(
-      activeItemIndex,
-      "category",
-      savedCategory.category || categoryName
-    );
+    const savedName = savedCategory?.category || categoryName;
+
+    // Add it to the dropdown immediately
+    setUserCategories((prev) => {
+      if (prev.includes(savedName)) {
+        return prev;
+      }
+
+      return [...prev.filter((cat) => cat !== "Other"), savedName, "Other"];
+    });
+
+    // Apply it to the item that selected "Other"
+    if (activeItemIndex !== null) {
+      handleItemChange(
+        activeItemIndex,
+        "category",
+        savedName
+      );
+    }
 
     // Close popup
     setShowCategoryPopup(false);
@@ -434,26 +320,36 @@ const saveCustomCategory = async () => {
                     }}
                   />
                   <select
-                 value={item.category}
-                 onChange={(e) => {
-                 const value = e.target.value;
+  value={item.category}
+  onChange={(e) => {
+    const value = e.target.value;
 
-                if (value === "Other") {
-                 setActiveItemIndex(index);
-                 setNewCategory("");
-                 setShowCategoryPopup(true);
-                  return;
-                 }
+    if (value === "Other") {
+      setActiveItemIndex(index);
+      setNewCategory("");
+      setShowCategoryPopup(true);
+      return;
+    }
 
-                 handleItemChange(index, "category", value);
-                 }}
-                  >
-                 {userCategories.map((cat) => (
-                   <option key={cat} value={cat}>
-                {cat}
-                </option>
-               ))}
-               </select>
+    handleItemChange(index, "category", value);
+  }}
+  style={{
+    padding: "10px 14px",
+    borderRadius: 8,
+    border: "1px solid #BFC9BD",
+    fontSize: 14,
+    color: "#191C1E",
+    outline: "none",
+    background: "white",
+    cursor: "pointer",
+  }}
+>
+  {userCategories.map((cat) => (
+    <option key={cat} value={cat}>
+      {cat}
+    </option>
+  ))}
+</select>
                 </div>
               ))}
             </div>
@@ -510,6 +406,140 @@ const saveCustomCategory = async () => {
           </div>
         </div>
       </div>
+{/* CATEGORY POPUP */}
+{showCategoryPopup && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0, 0, 0, 0.45)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1000,
+      padding: 20,
+    }}
+  >
+    <div
+      style={{
+        width: "100%",
+        maxWidth: 420,
+        background: "white",
+        borderRadius: 16,
+        padding: 28,
+        boxShadow: "0 20px 50px rgba(0,0,0,0.2)",
+      }}
+    >
+      <h2
+        style={{
+          margin: "0 0 8px",
+          fontSize: 22,
+          fontWeight: 700,
+          color: "#191C1E",
+        }}
+      >
+        Create a category
+      </h2>
+
+      <p
+        style={{
+          margin: "0 0 20px",
+          fontSize: 14,
+          color: "#404940",
+          lineHeight: "20px",
+        }}
+      >
+        Add a category to your personal categories.
+      </p>
+
+      <label
+        style={{
+          display: "block",
+          marginBottom: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          color: "#191C1E",
+        }}
+      >
+        Category name
+      </label>
+
+      <input
+        type="text"
+        value={newCategory}
+        onChange={(e) => setNewCategory(e.target.value)}
+        placeholder="e.g. Pet Care"
+        autoFocus
+        style={{
+          width: "100%",
+          boxSizing: "border-box",
+          padding: "12px 14px",
+          borderRadius: 8,
+          border: "1px solid #BFC9BD",
+          outline: "none",
+          fontSize: 14,
+          color: "#191C1E",
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 10,
+          marginTop: 20,
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => {
+            setShowCategoryPopup(false);
+            setNewCategory("");
+            setActiveItemIndex(null);
+          }}
+          style={{
+            padding: "10px 18px",
+            borderRadius: 8,
+            border: "1px solid #BFC9BD",
+            background: "white",
+            color: "#404940",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          onClick={saveCustomCategory}
+          disabled={!newCategory.trim() || isSavingCategory}
+          style={{
+            padding: "10px 18px",
+            borderRadius: 8,
+            border: "none",
+            background: "#004C22",
+            color: "white",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor:
+              !newCategory.trim() || isSavingCategory
+                ? "not-allowed"
+                : "pointer",
+            opacity:
+              !newCategory.trim() || isSavingCategory
+                ? 0.6
+                : 1,
+          }}
+        >
+          {isSavingCategory ? "Saving..." : "Save Category"}
+        </button>
+      </div>
     </div>
-  );
+  </div>
+)}
+</div>
+);
 }
+   
