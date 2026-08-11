@@ -229,21 +229,6 @@ export async function getCategories() {
   return data;
 }
 
-export async function createCategory(categoryData) {
-  const token = localStorage.getItem("token");
-  const response = await fetch(`${BASE_URL}/api/categories`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(categoryData),
-  });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || "Failed to create category.");
-  return data;
-}
-
 export async function deleteCategory(id) {
   const token = localStorage.getItem("token");
   const response = await fetch(`${BASE_URL}/api/categories/${id}`, {
