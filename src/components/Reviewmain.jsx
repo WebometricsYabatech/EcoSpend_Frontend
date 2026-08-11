@@ -44,8 +44,18 @@ export default function ReviewReceipt() {
  const [userCategories, setUserCategories] = useState(CATEGORY_OPTIONS);
  const [activeItemIndex, setActiveItemIndex] = useState(null);
  
+ 
 
  const addItem = () => setItems([...items, { ...EMPTY_ITEM }]);
+
+ const handleItemChange = (index, field, value) => {
+  const updated = [...items];
+  updated[index] = {
+    ...updated[index],
+    [field]: value,
+  };
+  setItems(updated);
+};
  const handleCategoryChange = (index, value) => {
   if (value === "Other") {
     setActiveItemIndex(index);

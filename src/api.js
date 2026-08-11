@@ -374,7 +374,7 @@ export async function getReceiptHistory() {
   return data;
 }
 export const createCategory = async (category) => {
-  const response = await API.post("/api/categories", {
+  const response = await api.post("/api/categories", {
     category,
   });
 
@@ -383,14 +383,14 @@ export const createCategory = async (category) => {
 
 // Update an existing category
 export const updateCategory = async (id, category) => {
-  const response = await API.put(`/api/categories/${id}`, {
+  const response = await api.put(`/api/categories/${id}`, {
     category,
   });
 
   return response.data;
 };
 export const updateCurrency = async (currency) => {
-  const response = await API.put("/api/profile/currency", {
+  const response = await api.put("/api/profile/currency", {
     currency,
   });
 
