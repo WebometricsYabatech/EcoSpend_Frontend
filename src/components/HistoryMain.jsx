@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 import { FiSliders } from "react-icons/fi";
 import { getReceiptHistory } from "../api";
+import { formatCurrency } from "../utils/currency";
 
 const CATEGORY_COLORS = {
   Groceries: "#006E2F",
@@ -620,7 +621,7 @@ navigate(`/ReviewDetails/${receipt.receiptId}`, {
                             color: "#191C1E",
                           }}
                         >
-                          ${Number(receipt.totalAmount).toFixed(2)}
+                          {formatCurrency(Number(receipt.totalAmount))}
                         </p>
                       </div>
             
@@ -736,7 +737,7 @@ navigate(`/ReviewDetails/${receipt.receiptId}`, {
             
                       {/* Desktop Total */}
                       <div style={{ fontSize: 16, color: "#191C1E" }}>
-                        ${Number(receipt.totalAmount).toFixed(2)}
+                      {formatCurrency(Number(receipt.totalAmount))}
                       </div>
             
                       {/* Desktop Eco Score */}
