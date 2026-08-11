@@ -40,11 +40,19 @@ export default function TopNavbar() {
 
       {/* User Profile */}
       <button className="overflow-hidden rounded-full border border-[#BFC9BD]">
-        <img
-          src={avatarUrl}
-          alt="Profile"
-          className="h-10 w-10 object-cover"
-        />
+      {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt="avatar"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                onError={() => {
+                  setAvatarUrl(null);
+                  localStorage.removeItem("avatarUrl");
+                }}
+              />
+            ) : (
+              <FaUser size={16} color="#BFC9BD" />
+            )}
       </button>
     </header>
   );
