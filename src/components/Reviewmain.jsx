@@ -179,7 +179,7 @@ const handleConfirm = async () => {
       fontFamily: "Inter, sans-serif",
     }}>
 
-      {/* Page Title */}
+      {/* Page Title REVIEW RECEIPT */}
       <h1 style={{
         fontFamily: "inter", fontSize: isMobile ? 24 : 32,
         fontWeight: 700, color: "#191C1E", margin: "0 0 24px",
