@@ -137,12 +137,20 @@ const handleConfirm = async () => {
     const receiptData = {
       store,
       date,
-      total: Number(total),
+      total: Math.round(Number(total) * 100) / 100,
+
+      sustainabilityScore,
+      sustainabilityTip,
+      receiptImage,
+
       items: items.map((item) => ({
-        ...item,
-        price: Number(item.price),
+        name: item.name,
+        price: Math.round(Number(item.price) * 100) / 100,
+        category: item.category,
       })),
     };
+
+    console.log("CONFIRM BODY:", receiptData);
 
     const response = await confirmReceipt(receiptData);
 
@@ -150,19 +158,18 @@ const handleConfirm = async () => {
       state: {
         receiptData: {
           ...receiptData,
-          sustainabilityScore,
-          sustainabilityTip,
-          receiptImage: scannedData.receiptImage,
+          ...response,
         },
       },
     });
+
   } catch (err) {
+    console.error("Confirm receipt failed:", err);
     setError(err.message || "Failed to confirm receipt.");
   } finally {
     setIsSaving(false);
   }
 };
-
   const handleCancel = () => navigate(-1);
 
   return (
