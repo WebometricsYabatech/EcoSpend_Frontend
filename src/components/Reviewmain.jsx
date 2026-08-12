@@ -49,8 +49,10 @@ const [isSaving, setIsSaving] = useState(false);
 const [error, setError] = useState("");
 
 const receiptImage =
-  scannedData?.receiptImage ||
-  scannedData?.receiptImageUrl ||
+  location.state?.receiptData?.receiptImageUrl ||
+  location.state?.receiptData?.receiptImage ||
+  location.state?.receiptImageUrl ||
+  location.state?.receiptImage ||
   "";
 
 const sustainabilityScore =
