@@ -138,7 +138,7 @@ const handleConfirm = async () => {
       store,
       date,
       total: Math.round(Number(total) * 100) / 100,
-      category: receiptCategory,
+      category: items[0]?.category || "Other",
       sustainabilityScore,
       sustainabilityTip,
       receiptImage,
