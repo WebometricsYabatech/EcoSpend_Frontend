@@ -26,12 +26,11 @@ export default function ReviewReceipt() {
 
   
   
-  const scannedData = location.state?.receiptData || {
-    store: "", date: "", total: 0,
-    sustainabilityScore: 0, sustainabilityTip: "", items: [],
-  };
+  const responseData = location.state?.receiptData || {};
 
-  const [store, setStore] = useState(scannedData.storeName || "");
+const scannedData = responseData.extractedData || responseData;
+
+  const [store, setStore] = useState(scannedData.extractedData.storeName || "");
   const [date, setDate] = useState(scannedData.date || "");
   const [total, setTotal] = useState(scannedData.total ?? 0);
   const [items, setItems] = useState(scannedData.items || []);
