@@ -93,7 +93,10 @@ export default function ReceiptHistory() {
 
   const filtered = receipts.filter((r) => {
     const store = r.storeName || "";
-    const category = r.category || "";
+    const category =
+    r.category ||
+    r.items?.[0]?.category ||
+    "Other";
   
     const matchesSearch =
       store.toLowerCase().includes(search.toLowerCase()) ||
@@ -661,7 +664,7 @@ navigate(`/ReviewDetails/${receipt.receiptId}`, {
                               color: "#404940",
                             }}
                           >
-                            {receipt.category || "Other"}
+                            {receipt.category || receipt.items?.[0]?.category || "Other"}
                           </span>
                         </div>
                       </div>

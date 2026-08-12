@@ -138,7 +138,7 @@ const handleConfirm = async () => {
       store,
       date,
       total: Math.round(Number(total) * 100) / 100,
-
+      category: receiptCategory,
       sustainabilityScore,
       sustainabilityTip,
       receiptImage,
@@ -150,7 +150,9 @@ const handleConfirm = async () => {
       })),
     };
 
-    console.log("CONFIRM BODY:", receiptData);
+    
+    console.log("CATEGORY BEING SENT:", items.map(item => item.category));
+    console.log("FULL CONFIRM BODY:", receiptData);
 
     const response = await confirmReceipt(receiptData);
 
