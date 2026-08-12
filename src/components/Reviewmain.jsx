@@ -28,38 +28,72 @@ export default function ReviewReceipt() {
   
   const responseData = location.state?.receiptData || {};
 
+// Handle both:
+// { extractedData: { storeName: "DOORDASH" } }
+// and
+// { storeName: "DOORDASH" }
 const scannedData = responseData?.extractedData || responseData;
 
-const [store, setStore] = useState(
-  scannedData?.storeName || scannedData?.store || ""
-);
+console.log("🚨 LOCATION STATE:", location.state);
+console.log("🚨 RECEIPT DATA:", responseData);
+console.log("🚨 SCANNED DATA:", scannedData);
+console.log("🚨 STORE NAME FROM AI:", scannedData?.storeName);
+console.log("🚨 STORE FROM DATA:", scannedData?.store);
 
-const [date, setDate] = useState(
-  scannedData?.date || ""
-);
+const [store, setStore] = useState("");
+const [date, setDate] = useState("");
+const [total, setTotal] = useState(0);
+const [items, setItems] = useState([]);
 
-const [total, setTotal] = useState(
-  scannedData?.total ??
-  (scannedData?.items || []).reduce(
-    (sum, item) => sum + Number(item.price || 0),
-    0
-  )
-);
+const [isSaving, setIsSaving] = useState(false);
+const [error, setError] = useState("");
 
-const [items, setItems] = useState(
-  (scannedData?.items || []).map((item) => ({
-    ...item,
-    category: item.category || scannedData?.category || "Other",
-  }))
-);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState("");
-  const receiptImage =
+const receiptImage =
   scannedData?.receiptImage ||
   scannedData?.receiptImageUrl ||
   "";
-  const sustainabilityScore = scannedData.sustainabilityScore;
-  const sustainabilityTip = scannedData.sustainabilityTip;
+
+const sustainabilityScore =
+  scannedData?.sustainabilityScore ?? 0;
+
+const sustainabilityTip =
+  scannedData?.sustainabilityTip || "";
+
+
+// IMPORTANT: populate the form whenever the scanned data changes
+useEffect(() => {
+  const data = location.state?.receiptData || {};
+  const extracted = data?.extractedData || data;
+
+  console.log("🔄 LOADING SCANNED DATA:", extracted);
+  console.log("🏪 STORE NAME:", extracted?.storeName);
+
+  setStore(
+    extracted?.storeName ||
+    extracted?.store ||
+    ""
+  );
+
+  setDate(extracted?.date || "");
+
+  setTotal(
+    extracted?.total ??
+    (extracted?.items || []).reduce(
+      (sum, item) => sum + Number(item.price || 0),
+      0
+    )
+  );
+
+  setItems(
+    (extracted?.items || []).map((item) => ({
+      ...item,
+      category:
+        item.category ||
+        extracted?.category ||
+        "Other",
+    }))
+  );
+}, [location.state]);
   const [showCategoryPopup, setShowCategoryPopup] = useState(false);
  const [newCategory, setNewCategory] = useState("");
  const [isSavingCategory, setIsSavingCategory] = useState(false);
