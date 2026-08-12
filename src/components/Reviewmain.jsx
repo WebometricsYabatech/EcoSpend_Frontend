@@ -50,25 +50,45 @@ export default function ReviewReceipt() {
     try {
       const data = await getCategories();
 
+      console.log("📦 CATEGORIES RESPONSE:", data);
+
       const categories = Array.isArray(data)
         ? data
-        : data.categories || [];
+        : data?.categories || [];
+
+      const customCategories = categories
+        .map((category) => {
+          // Backend returns objects: { id, name, userId, createdAt }
+          if (typeof category === "object") {
+            return category.name;
+          }
+
+          // In case backend returns strings
+          return category;
+        })
+        .filter(Boolean)
+        .filter(
+          (name) => !CATEGORY_OPTIONS.includes(name)
+        );
 
       setUserCategories([
         ...CATEGORY_OPTIONS,
-        ...categories
-          .map((category) => category.name)
-          .filter(
-            (name) => !CATEGORY_OPTIONS.includes(name)
-          ),
+        ...customCategories,
       ]);
+
+      console.log("✅ DROPDOWN CATEGORIES:", [
+        ...CATEGORY_OPTIONS,
+        ...customCategories,
+      ]);
+
     } catch (error) {
-      console.error("Failed to load categories:", error);
+      console.error("❌ Failed to load categories:", error);
     }
   };
 
   loadCategories();
 }, []);
+  
  
 
  const addItem = () => setItems([...items, { ...EMPTY_ITEM }]);
@@ -387,11 +407,11 @@ const handleConfirm = async () => {
     cursor: "pointer",
   }}
 >
-  {userCategories.map((cat) => (
-    <option key={cat} value={cat}>
-      {cat}
-    </option>
-  ))}
+{userCategories.map((cat) => (
+  <option key={cat} value={cat}>
+    {cat}
+  </option>
+))}
 </select>
                 </div>
               ))}
