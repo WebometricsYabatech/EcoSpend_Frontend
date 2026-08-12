@@ -31,7 +31,7 @@ export default function ReviewReceipt() {
     sustainabilityScore: 0, sustainabilityTip: "", items: [],
   };
 
-  const [store, setStore] = useState(scannedData.store || "");
+  const [store, setStore] = useState(scannedData.storeName || "");
   const [date, setDate] = useState(scannedData.date || "");
   const [total, setTotal] = useState(scannedData.total ?? 0);
   const [items, setItems] = useState(scannedData.items || []);
