@@ -28,15 +28,36 @@ export default function ReviewReceipt() {
   
   const responseData = location.state?.receiptData || {};
 
-const scannedData = responseData.extractedData || responseData;
+const scannedData = responseData?.extractedData || responseData;
 
-  const [store, setStore] = useState(scannedData.extractedData.storeName || "");
-  const [date, setDate] = useState(scannedData.date || "");
-  const [total, setTotal] = useState(scannedData.total ?? 0);
-  const [items, setItems] = useState(scannedData.items || []);
+const [store, setStore] = useState(
+  scannedData?.storeName || scannedData?.store || ""
+);
+
+const [date, setDate] = useState(
+  scannedData?.date || ""
+);
+
+const [total, setTotal] = useState(
+  scannedData?.total ??
+  (scannedData?.items || []).reduce(
+    (sum, item) => sum + Number(item.price || 0),
+    0
+  )
+);
+
+const [items, setItems] = useState(
+  (scannedData?.items || []).map((item) => ({
+    ...item,
+    category: item.category || scannedData?.category || "Other",
+  }))
+);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-  const receiptImage = scannedData.receiptImage;
+  const receiptImage =
+  scannedData?.receiptImage ||
+  scannedData?.receiptImageUrl ||
+  "";
   const sustainabilityScore = scannedData.sustainabilityScore;
   const sustainabilityTip = scannedData.sustainabilityTip;
   const [showCategoryPopup, setShowCategoryPopup] = useState(false);
