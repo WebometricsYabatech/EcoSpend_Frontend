@@ -26,7 +26,7 @@ export default function ReviewReceipt() {
 
   
   
-  const [store, setStore] = useState("");
+  const [storeName, setStoreName] = useState("");
   const [date, setDate] = useState("");
   const [total, setTotal] = useState(0);
   const [items, setItems] = useState([]);
@@ -57,7 +57,6 @@ export default function ReviewReceipt() {
   console.log("RESPONSE DATA:", responseData);
   console.log("SCANNED DATA:", scannedData);
   console.log("STORE NAME:", scannedData?.storeName);
-  console.log("STORE:", scannedData?.store);
   console.log("DATE:", scannedData?.date);
   console.log("ITEMS:", scannedData?.items);
   console.log("==================================");
@@ -98,14 +97,14 @@ export default function ReviewReceipt() {
     console.log("🤖 EXTRACTED:", extracted);
     console.log("🏪 STORE NAME:", extracted?.storeName);
   
-    const detectedStore =
+    const detectedStoreName =
       extracted?.storeName ||
       extracted?.store ||
       "";
   
-    console.log("✅ FINAL STORE:", detectedStore);
+    console.log("✅ FINAL STORE:", detectedStoreName);
   
-    setStore(detectedStore);
+    setStoreName(detectedStoreName);
   
     setDate(
       extracted?.date || ""
@@ -251,7 +250,7 @@ const handleConfirm = async () => {
 
   try {
     const receiptData = {
-      store,
+      storeName,
       date,
       total: Math.round(Number(total) * 100) / 100,
       category: items[0]?.category || "Other",
@@ -314,7 +313,7 @@ const handleConfirm = async () => {
       }}>
         <img src={AIicon} style={{ flexShrink: 0 }} />
         <p style={{ margin: 0, color: "#007432", fontSize: 14, fontWeight: 600 }}>
-          AI extracted {items.length} items from your receipt at {store}. Please verify and confirm.
+          AI extracted {items.length} items from your receipt at {storeName}. Please verify and confirm.
         </p>
       </div>
 
@@ -378,7 +377,7 @@ const handleConfirm = async () => {
               <span style={{ color: "#404940", fontSize: 14, fontWeight: 600 }}>Store</span>
               <input
                 value={store}
-                onChange={(e) => setStore(e.target.value)}
+                onChange={(e) => setStoreName(e.target.value)}
                 style={{
                   border: "1px solid #BFC9BD", borderRadius: 6, padding: "4px 10px",
                   fontSize: 14, fontWeight: 600, color: "#191C1E", textAlign: "right",
