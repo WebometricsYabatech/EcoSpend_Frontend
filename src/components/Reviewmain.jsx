@@ -26,76 +26,116 @@ export default function ReviewReceipt() {
 
   
   
-  const responseData = location.state?.receiptData || {};
-
-// Handle both:
-// { extractedData: { storeName: "DOORDASH" } }
-// and
-// { storeName: "DOORDASH" }
-const scannedData = responseData?.extractedData || responseData;
-
-console.log("🚨 LOCATION STATE:", location.state);
-console.log("🚨 RECEIPT DATA:", responseData);
-console.log("🚨 SCANNED DATA:", scannedData);
-console.log("🚨 STORE NAME FROM AI:", scannedData?.storeName);
-console.log("🚨 STORE FROM DATA:", scannedData?.store);
-
-const [store, setStore] = useState("");
-const [date, setDate] = useState("");
-const [total, setTotal] = useState(0);
-const [items, setItems] = useState([]);
-
-const [isSaving, setIsSaving] = useState(false);
-const [error, setError] = useState("");
-
-const receiptImage =
-  location.state?.receiptData?.receiptImageUrl ||
-  location.state?.receiptData?.receiptImage ||
-  location.state?.receiptImageUrl ||
-  location.state?.receiptImage ||
-  "";
-
-const sustainabilityScore =
-  scannedData?.sustainabilityScore ?? 0;
-
-const sustainabilityTip =
-  scannedData?.sustainabilityTip || "";
-
-
-// IMPORTANT: populate the form whenever the scanned data changes
-useEffect(() => {
-  const data = location.state?.receiptData || {};
-  const extracted = data?.extractedData || data;
-
-  console.log("🔄 LOADING SCANNED DATA:", extracted);
-  console.log("🏪 STORE NAME:", extracted?.storeName);
-
-  setStore(
-    extracted?.storeName ||
-    extracted?.store ||
-    ""
-  );
-
-  setDate(extracted?.date || "");
-
-  setTotal(
-    extracted?.total ??
-    (extracted?.items || []).reduce(
-      (sum, item) => sum + Number(item.price || 0),
-      0
-    )
-  );
-
-  setItems(
-    (extracted?.items || []).map((item) => ({
-      ...item,
-      category:
-        item.category ||
-        extracted?.category ||
-        "Other",
-    }))
-  );
-}, [location.state]);
+  const [store, setStore] = useState("");
+  const [date, setDate] = useState("");
+  const [total, setTotal] = useState(0);
+  const [items, setItems] = useState([]);
+  
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+  
+  // Get whatever was passed through navigation
+  const state = location.state || {};
+  
+  console.log("========== RECEIPT DEBUG ==========");
+  console.log("FULL LOCATION STATE:", state);
+  
+  // Support these possible structures:
+  //
+  // 1. state.receiptData.extractedData
+  // 2. state.extractedData
+  // 3. state.receiptData
+  // 4. state itself
+  const responseData =
+    state.receiptData ||
+    state;
+  
+  const scannedData =
+    responseData?.extractedData ||
+    responseData;
+  
+  console.log("RESPONSE DATA:", responseData);
+  console.log("SCANNED DATA:", scannedData);
+  console.log("STORE NAME:", scannedData?.storeName);
+  console.log("STORE:", scannedData?.store);
+  console.log("DATE:", scannedData?.date);
+  console.log("ITEMS:", scannedData?.items);
+  console.log("==================================");
+  
+  // Receipt image
+  const receiptImage =
+    responseData?.receiptImageUrl ||
+    responseData?.receiptImage ||
+    scannedData?.receiptImageUrl ||
+    scannedData?.receiptImage ||
+    "";
+  
+  // Sustainability
+  const sustainabilityScore =
+    responseData?.sustainabilityScore ??
+    scannedData?.sustainabilityScore ??
+    0;
+  
+  const sustainabilityTip =
+    responseData?.sustainabilityTip ||
+    scannedData?.sustainabilityTip ||
+    "";
+  
+  // Populate form
+  useEffect(() => {
+    const state = location.state || {};
+  
+    const responseData =
+      state.receiptData ||
+      state;
+  
+    const extracted =
+      responseData?.extractedData ||
+      responseData;
+  
+    console.log("🔄 POPULATING REVIEW RECEIPT");
+    console.log("📦 RESPONSE:", responseData);
+    console.log("🤖 EXTRACTED:", extracted);
+    console.log("🏪 STORE NAME:", extracted?.storeName);
+  
+    const detectedStore =
+      extracted?.storeName ||
+      extracted?.store ||
+      "";
+  
+    console.log("✅ FINAL STORE:", detectedStore);
+  
+    setStore(detectedStore);
+  
+    setDate(
+      extracted?.date || ""
+    );
+  
+    const calculatedTotal =
+      (extracted?.items || []).reduce(
+        (sum, item) =>
+          sum + Number(item?.price || 0),
+        0
+      );
+  
+    setTotal(
+      extracted?.total != null
+        ? Number(extracted.total)
+        : calculatedTotal
+    );
+  
+    setItems(
+      (extracted?.items || []).map((item) => ({
+        name: item?.name || "",
+        price: Number(item?.price || 0),
+        category:
+          item?.category ||
+          extracted?.category ||
+          "Other",
+      }))
+    );
+  
+  }, [location.state]);
   const [showCategoryPopup, setShowCategoryPopup] = useState(false);
  const [newCategory, setNewCategory] = useState("");
  const [isSavingCategory, setIsSavingCategory] = useState(false);
