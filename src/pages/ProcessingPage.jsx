@@ -48,14 +48,23 @@ export default function ProcessingPage() {
         setStatus("Complete!");
 
         setTimeout(() => {
+          console.log("🚨 DATA GOING TO REVIEW PAGE:", {
+            receiptImageUrl: response.receiptImageUrl,
+            storeName: extracted.storeName,
+            date: extracted.date,
+            total: extracted.totalAmount,
+            items: extracted.items,
+          });
+        
           navigate("/ReviewPage", {
             state: {
               receiptData: {
-                receiptImage: URL.createObjectURL(file),
-                store: extracted.store,
+                receiptImageUrl: response.receiptImageUrl,
+                storeName: extracted.storeName,
                 date: extracted.date,
                 total: extracted.totalAmount,
                 items: extracted.items,
+                category: extracted.category,
                 sustainabilityScore: extracted.sustainabilityScore,
                 sustainabilityTip: extracted.sustainabilityTip,
               },

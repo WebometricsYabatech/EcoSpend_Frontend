@@ -98,10 +98,11 @@ export default function ReviewReceipt() {
     console.log("🏪 STORE NAME:", extracted?.storeName);
   
     const detectedStoreName =
-      extracted?.storeName ||
-      extracted?.store ||
-      "";
-  
+    extracted?.storeName ||
+    extracted?.store ||
+    responseData?.storeName ||
+    responseData?.store ||
+     "";
     console.log("✅ FINAL STORE:", detectedStoreName);
   
     setStoreName(detectedStoreName);
@@ -117,11 +118,13 @@ export default function ReviewReceipt() {
         0
       );
   
-    setTotal(
-      extracted?.total != null
-        ? Number(extracted.total)
-        : calculatedTotal
-    );
+      setTotal(
+        extracted?.totalAmount != null
+          ? Number(extracted.totalAmount)
+          : extracted?.total != null
+          ? Number(extracted.total)
+          : calculatedTotal
+      );
   
     setItems(
       (extracted?.items || []).map((item) => ({
@@ -337,7 +340,7 @@ const handleConfirm = async () => {
             border: "1px solid #BFC9BD", overflow: "hidden", position: "relative",
           }}>
             <img
-              src={receiptImage || "https://placehold.co/600x400"}
+              src={receiptImage}
               alt="Scanned receipt"
               style={{ width: "100%", display: "block", objectFit: "cover" }}
             />
