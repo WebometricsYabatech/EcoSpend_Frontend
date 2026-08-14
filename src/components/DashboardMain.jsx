@@ -463,8 +463,6 @@ export default function DashboardMain() {
   const category = (r.category || r.categoryName || "OTHER").toUpperCase();
   const catStyle = CATEGORY_STYLES[category] || CATEGORY_STYLES.OTHER;
 
-  // Individual receipt score
-  const score = r.sustainabilityScore ?? r.ecoScore ?? null;
 
   // Backend returns storeName
   const storeName =
