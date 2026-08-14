@@ -453,7 +453,7 @@ export default function DashboardMain() {
 
               {/* Table header */}
               <div style={{ display: "grid", gridTemplateColumns: "2fr 1.5fr 1.5fr 1.5fr 1fr", background: "#F2F4F6", padding: "0 24px" }}>
-                {["Store", "Date", "Total", "Category", "Score"].map((h) => (
+                {["Store", "Date", "Total", "Category"].map((h) => (
                   <div key={h} style={{ padding: "16px 0", fontSize: 14, fontWeight: 600, color: "#404940" }}>{h}</div>
                 ))}
               </div>
@@ -521,9 +521,6 @@ export default function DashboardMain() {
                         {category}
                       </span>
                     </div>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: score != null ? "#006E2F" : "#BFC9BD" }}>
-                      {score != null ? `${Math.round(score)}` : "—"}
-                    </span>
                   </div>
                 );
               })}
