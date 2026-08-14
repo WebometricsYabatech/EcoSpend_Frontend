@@ -147,34 +147,13 @@ export default function ReviewReceipt() {
 
       console.log("📦 CATEGORIES RESPONSE:", data);
 
-      const categories = Array.isArray(data)
-        ? data
-        : data?.categories || [];
+      const categories = Array.isArray(data?.allCategories)
+        ? data.allCategories
+        : CATEGORY_OPTIONS;
 
-      const customCategories = categories
-        .map((category) => {
-          // Backend returns objects: { id, name, userId, createdAt }
-          if (typeof category === "object") {
-            return category.name;
-          }
+      setUserCategories(categories);
 
-          // In case backend returns strings
-          return category;
-        })
-        .filter(Boolean)
-        .filter(
-          (name) => !CATEGORY_OPTIONS.includes(name)
-        );
-
-      setUserCategories([
-        ...CATEGORY_OPTIONS,
-        ...customCategories,
-      ]);
-
-      console.log("✅ DROPDOWN CATEGORIES:", [
-        ...CATEGORY_OPTIONS,
-        ...customCategories,
-      ]);
+      console.log("✅ DROPDOWN CATEGORIES:", categories);
 
     } catch (error) {
       console.error("❌ Failed to load categories:", error);
@@ -183,9 +162,6 @@ export default function ReviewReceipt() {
 
   loadCategories();
 }, []);
-  
- 
-
  const addItem = () => setItems([...items, { ...EMPTY_ITEM }]);
 
  const handleItemChange = (index, field, value) => {
