@@ -286,7 +286,7 @@ export async function changePassword(newPassword) {
 // ── USER ──
 export async function getUserProfile() {
   const token = localStorage.getItem("token");
-  const response = await fetch(`${BASE_URL}/api/user/profile`, {
+  const response = await fetch(`${BASE_URL}/api/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await response.json();
