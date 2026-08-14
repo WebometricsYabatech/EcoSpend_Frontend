@@ -376,7 +376,7 @@ const handleConfirm = async () => {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ color: "#404940", fontSize: 14, fontWeight: 600 }}>Store</span>
               <input
-                value={store}
+                value={storeName}
                 onChange={(e) => setStoreName(e.target.value)}
                 style={{
                   border: "1px solid #BFC9BD", borderRadius: 6, padding: "4px 10px",
