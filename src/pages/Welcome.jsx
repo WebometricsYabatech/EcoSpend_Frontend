@@ -5,8 +5,30 @@ import { FaLeaf, FaLock, FaArrowRight, FaReceipt } from "react-icons/fa";
 import ecoIcon from "../assets/eco-icon.svg";
 import aiIcon from "../assets/AI-iconGreen.svg";
 import { FaClock, FaClockRotateLeft } from "react-icons/fa6";
+import { useEffect, useState } from "react";
+import { getReceiptHistory } from "../api";
 
 export default function WelcomePage() {
+  const [hasReceipts, setHasReceipts] = useState(false);
+
+  useEffect(() => {
+    const checkReceipts = async () => {
+      try {
+        const data = await getReceiptHistory();
+
+        console.log("Receipt history:", data);
+
+        const receipts = data?.receipts || data?.data || [];
+
+        setHasReceipts(receipts.length > 0);
+      } catch (error) {
+        console.error("Failed to check receipts:", error);
+      }
+    };
+
+    checkReceipts();
+  }, []);
+
   return (
     <div className="relative min-h-screen bg-[#F7F9FB] flex items-center justify-center px-4 py-10 overflow-hidden">
 
@@ -59,9 +81,10 @@ export default function WelcomePage() {
             </h2>
 
             <p className="mx-auto mt-6 max-w-lg text-s leading-7 text-[#404940]">
-              Let's start by uploading your first receipt.
-              
-            </p>
+          {hasReceipts
+          ? "Upload another receipt to keep tracking your spending and sustainability."
+          : "Let's start by uploading your first receipt."}
+        </p>
 
             {/* Badges */}
             <div className="mt-8 flex flex-wrap justify-center gap-4">
@@ -92,8 +115,8 @@ export default function WelcomePage() {
           <button
             className="flex w-full items-center justify-center gap-1 rounded-lg bg-[#004C22] py-4 text-s font-semibold text-white transition hover:bg-[#006E2F]"
           >
-            <FaReceipt />
-            Upload your first receipt
+           <FaReceipt />
+           {hasReceipts ? "Upload another receipt" : "Upload your first receipt"}
             <FaArrowRight />
           </button>
           </Link>
