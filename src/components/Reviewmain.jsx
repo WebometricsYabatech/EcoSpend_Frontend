@@ -64,9 +64,7 @@ export default function ReviewReceipt() {
   // Receipt image
   const receiptImage =
     responseData?.receiptUrl ||
-    responseData?.receiptImage ||
     scannedData?.receiptUrl ||
-    scannedData?.receiptImage ||
     "";
   
   // Sustainability
