@@ -49,7 +49,7 @@ export default function ProcessingPage() {
 
         setTimeout(() => {
           console.log("🚨 DATA GOING TO REVIEW PAGE:", {
-            receiptImageUrl: response.receiptImageUrl,
+            receiptImageUrl: response.receiptUrl,
             storeName: extracted.storeName,
             date: extracted.date,
             total: extracted.totalAmount,
@@ -59,7 +59,7 @@ export default function ProcessingPage() {
           navigate("/ReviewPage", {
             state: {
               receiptData: {
-                receiptImageUrl: response.receiptImageUrl,
+                receiptImageUrl: response.receiptUrl,
                 storeName: extracted.storeName,
                 date: extracted.date,
                 total: extracted.totalAmount,

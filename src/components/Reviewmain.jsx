@@ -63,9 +63,9 @@ export default function ReviewReceipt() {
   
   // Receipt image
   const receiptImage =
-    responseData?.receiptImageUrl ||
+    responseData?.receiptUrl ||
     responseData?.receiptImage ||
-    scannedData?.receiptImageUrl ||
+    scannedData?.receiptUrl ||
     scannedData?.receiptImage ||
     "";
   
