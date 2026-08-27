@@ -182,7 +182,7 @@ export default function ReceiptDetails() {
               overflow: "hidden",
             }}>
               <img
-                src={receiptData.receiptImage || "https://placehold.co/400x500"}
+                src={receiptData.receiptUrl || "https://placehold.co/400x500"}
                 alt="Scanned receipt"
                 style={{ width: "100%", display: "block", opacity: 0.9 }}
               />
