@@ -130,6 +130,7 @@ navigate(`/ReviewDetails/${receipt.receiptId}`, {
       total: Number(receipt.totalAmount),
       ecoScore: ecoScorePercentage,
       sustainabilityScore: rawEcoScore,
+      receiptUrl: receipt.receiptUrl,
 
       ecoLabel:
         ecoScorePercentage >= 70
