@@ -52,6 +52,9 @@ export default function LoginRHS() {
       setLoading(false);
     }
   };
+  const handleGoogleLogin = () => {
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`;
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-10 py-10">
@@ -170,10 +173,11 @@ export default function LoginRHS() {
 
           {/* Social buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              type="button"
-              className="flex-1 flex items-center justify-center gap-2 py-2 border border-[#BFC9BD] rounded-lg text-[#191C1E] font-['Inter'] hover:bg-white transition"
-            >
+          <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="flex-1 flex items-center justify-center gap-2 py-2 border border-[#BFC9BD] rounded-lg text-[#191C1E] font-['Inter'] hover:bg-white transition"
+         >
               <img src={google} alt="Google" className="w-5 h-5" />
               Sign in with Google
             </button>
