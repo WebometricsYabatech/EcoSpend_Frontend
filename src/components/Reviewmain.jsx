@@ -62,7 +62,7 @@ export default function ReviewReceipt() {
   console.log("==================================");
   
   // Receipt image
-  const receiptImage =
+  const receiptUrl =
     responseData?.receiptUrl ||
     scannedData?.receiptUrl ||
     "";
@@ -233,7 +233,7 @@ const handleConfirm = async () => {
       category: items[0]?.category || "Other",
       sustainabilityScore,
       sustainabilityTip,
-      receiptImage,
+      receiptUrl,
 
       items: items.map((item) => ({
         name: item.name,
@@ -338,7 +338,7 @@ const handleConfirm = async () => {
             border: "1px solid #BFC9BD", overflow: "hidden", position: "relative",
           }}>
             <img
-              src={receiptImage}
+              src={receiptUrl}
               alt="Scanned receipt"
               style={{ width: "100%", display: "block", objectFit: "cover" }}
             />
