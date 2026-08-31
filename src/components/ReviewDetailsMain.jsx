@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   FaLeaf, FaCalendarAlt, FaDownload,
-  FaEdit, FaChevronRight, FaExpand, FaCompress,
+  FaEdit, FaChevronRight, FaExpand, FaCompress, FaTrash,
 } from "react-icons/fa";
+import { deleteReceipt } from "../api";
 
 
 const getImpactColor = (grade) => {
@@ -30,10 +31,11 @@ const getItemIconColor = (grade) => {
 export default function ReceiptDetails() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { receiptId } = useParams();
   const [expanded, setExpanded] = useState(false);
   const [showAllItems, setShowAllItems] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
+  const [isDeleting, setIsDeleting] = useState(false);
   useEffect(() => {
     const handle = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handle);
@@ -76,7 +78,30 @@ export default function ReceiptDetails() {
   const circumference = 2 * Math.PI * radius;
   
   const strokeDash =
-    (safeEcoScore / 100) * circumference;
+  (safeEcoScore / 100) * circumference;
+
+// DELETE RECEIPT
+const handleDelete = async () => {
+  const confirmed = window.confirm(
+    "Are you sure you want to delete this receipt? This action cannot be undone."
+  );
+
+  if (!confirmed) return;
+
+  try {
+    setIsDeleting(true);
+
+    await deleteReceipt(receiptId);
+
+    navigate("/ReceiptHistory");
+  } catch (error) {
+    console.error("Failed to delete receipt:", error);
+    alert(error.message || "Failed to delete receipt. Please try again.");
+  } finally {
+    setIsDeleting(false);
+  }
+};
+
   return (
     <div
   style={{
@@ -127,20 +152,52 @@ export default function ReceiptDetails() {
 
         {/* Right: action buttons */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              display: "flex", alignItems: "center", gap: 6,
-              padding: "8px 16px", borderRadius: 8, border: "none",
-              background: "#004C22", fontSize: 14, fontWeight: 600,
-              color: "white", cursor: "pointer",
-            }}
-          >
-            <FaEdit size={13} />
-            {!isMobile && "Edit Receipt"}
-          </button>
-        </div>
+
+  {/* Edit button */}
+  <button
+    onClick={() => navigate(-1)}
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      padding: "8px 16px",
+      borderRadius: 8,
+      border: "none",
+      background: "#004C22",
+      fontSize: 14,
+      fontWeight: 600,
+      color: "white",
+      cursor: "pointer",
+    }}
+  >
+    <FaEdit size={13} />
+    {!isMobile && "Edit Receipt"}
+  </button>
+
+  {/* Delete button */}
+  <button
+    onClick={handleDelete}
+    disabled={isDeleting}
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      padding: "8px 16px",
+      borderRadius: 8,
+      border: "1px solid #BA1A1A",
+      background: "white",
+      fontSize: 14,
+      fontWeight: 600,
+      color: "#BA1A1A",
+      cursor: isDeleting ? "not-allowed" : "pointer",
+      opacity: isDeleting ? 0.6 : 1,
+    }}
+  >
+    <FaTrash size={13} />
+    {!isMobile && (isDeleting ? "Deleting..." : "Delete Receipt")}
+  </button>
+
+</div>
       </div>
 
       {/* ── MAIN GRID ── */}
