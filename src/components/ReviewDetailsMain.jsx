@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   FaLeaf, FaCalendarAlt, FaDownload,
   FaEdit, FaChevronRight, FaExpand, FaCompress, FaTrash,
@@ -30,19 +30,23 @@ const getItemIconColor = (grade) => {
 
 export default function ReceiptDetails() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { receiptId } = useParams();
-  const [expanded, setExpanded] = useState(false);
-  const [showAllItems, setShowAllItems] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [isDeleting, setIsDeleting] = useState(false);
+const navigate = useNavigate();
+
+const [expanded, setExpanded] = useState(false);
+const [showAllItems, setShowAllItems] = useState(false);
+const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+const [isDeleting, setIsDeleting] = useState(false);
+
+const receiptData =
+  location.state?.confirmedData || location.state?.receiptData;
+
+const receiptId = receiptData?.receiptId;
   useEffect(() => {
     const handle = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handle);
     return () => window.removeEventListener("resize", handle);
   }, []);
 
-  const receiptData = location.state?.confirmedData || location.state?.receiptData;
 
   if (!receiptData) {
     return (
@@ -82,6 +86,11 @@ export default function ReceiptDetails() {
 
 // DELETE RECEIPT
 const handleDelete = async () => {
+  if (!receiptId) {
+    alert("Receipt ID not found.");
+    return;
+  }
+
   const confirmed = window.confirm(
     "Are you sure you want to delete this receipt? This action cannot be undone."
   );
@@ -239,10 +248,17 @@ const handleDelete = async () => {
               overflow: "hidden",
             }}>
               <img
-                src={receiptData.receiptUrl || "https://placehold.co/400x500"}
-                alt="Scanned receipt"
-                style={{ width: "100%", display: "block", opacity: 0.9 }}
-              />
+             src={receiptData.receiptUrl}
+            alt="Scanned receipt"
+            style={{
+            width: "100%",
+            display: "block",
+            opacity: 0.9,
+           }}
+          onError={(e) => {
+          console.error("Receipt image failed to load:", receiptData.receiptUrl);
+          }}
+         />
             </div>
           </div>
         </div>
@@ -280,7 +296,7 @@ const handleDelete = async () => {
                     margin: 0, fontFamily: "DM Sans", fontSize: 20,
                     fontWeight: 600, color: "#191C1E", lineHeight: "28px",
                   }}>
-                    {receiptData.store}
+                    {receiptData.storeName}
                   </p>
                   <p style={{ margin: 0, fontSize: 14, color: "#404940" }}>
                     {receiptData.location}
@@ -316,7 +332,7 @@ const handleDelete = async () => {
                 fontSize: isMobile ? 36 : 48,
                 fontWeight: 700, color: "#004C22", lineHeight: "1.2",
               }}>
-                {receiptData.total}
+                {receiptData.totalAmount}
               </p>
             </div>
 
