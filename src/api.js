@@ -448,24 +448,3 @@ export async function updateCurrency(currency) {
 
   return data;
 }
-export async function deleteReceipt(receiptId) {
-  const token = localStorage.getItem("token");
-
-  const response = await fetch(
-    `${BASE_URL}/api/receipts/${receiptId}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to delete receipt.");
-  }
-
-  return data;
-}
