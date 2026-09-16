@@ -22,6 +22,9 @@ export async function signupUser(fullname, email, password) {
   if (!response.ok) throw new Error(data.message || "Signup failed. Please try again.");
   return data;
 }
+export function loginWithGoogle() {
+  window.location.href = `${BASE_URL}/api/auth/google`;
+}
 
 export async function logoutUser() {
   const token = localStorage.getItem("token");

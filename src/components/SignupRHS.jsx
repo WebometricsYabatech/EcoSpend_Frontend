@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaArrowRight } from "react-icons/fa";
 import google from "../assets/google.svg";
 import ecoIcon from "../assets/eco-icon.svg";
-import { signupUser } from "../api";
+import { signupUser, loginWithGoogle } from "../api";
 
 export default function SignupRHS() {
   const [formData, setFormData] = useState({
@@ -266,13 +266,14 @@ export default function SignupRHS() {
 
         {/* Social buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            type="button"
-            className="flex-1 flex items-center justify-center gap-2 py-2 border border-[#BFC9BD] rounded-lg text-[#191C1E] font-['Inter'] hover:bg-white transition"
-          >
-            <img src={google} alt="Google" className="w-5 h-5" />
-            Google
-          </button>
+        <button
+       type="button"
+       onClick={loginWithGoogle}
+       className="flex-1 flex items-center justify-center gap-2 py-2 border border-[#BFC9BD] rounded-lg text-[#191C1E] font-['Inter'] hover:bg-white transition"
+       >
+       <img src={google} alt="Google" className="w-5 h-5" />
+       Google
+       </button>
         </div>
 
         {/* Login link */}
