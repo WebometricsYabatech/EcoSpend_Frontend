@@ -11,12 +11,14 @@ import ReviewDetails from "./pages/ReviewDetails";
 import ReceiptHistory from "./pages/ReceiptHistory";
 import Dashboard from "./pages/Dashboard";
 import ProfileAndSettings from "./pages/ProfileAndSettings";
+import DashboardPreview from "./pages/DashboardPreview";
 
 export default function App(){
   return(
 <Routes>
   <Route path="/" element={<LandingPage />} />
   <Route path="/LoginPage" element={<LoginPage />} />
+  <Route path="/preview" element={<DashboardPreview />} />
   <Route path="/SignupPage" element={<SignupPage />} />
   <Route path="/ForgotPassword" element={<ForgotPassword />} />
   <Route path="/Welcome" element={<Welcome />} />

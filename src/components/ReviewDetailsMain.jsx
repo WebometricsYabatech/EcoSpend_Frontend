@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from "react";
-import "../App.css";
-import { useLocation, useNavigate } from "react-router-dom";
-import {
-  FaLeaf, FaCalendarAlt, FaDownload,
-  FaEdit, FaChevronRight, FaExpand, FaCompress, FaTrash,
-} from "react-icons/fa";
-import { deleteReceipt } from "../api";
+import { deleteReceipt, getUserProfile } from "../api";
+import { EcoScoreInfo } from "../components/InfoTip";
+import { formatMoney } from "../utils/format";
+// import React, { useState, useEffect } from "react";
+// import "../App.css";
+// import { useLocation, useNavigate } from "react-router-dom";
+// import {
+//   FaLeaf, FaCalendarAlt, FaDownload,
+//   FaEdit, FaChevronRight, FaExpand, FaCompress, FaTrash,
+// } from "react-icons/fa";
+// import { deleteReceipt } from "../api";
+// import { EcoScoreInfo } from "../components/InfoTip";
+
 
 
 const getImpactColor = (grade) => {
@@ -41,11 +46,16 @@ const receiptData =
   location.state?.confirmedData || location.state?.receiptData;
 
 const receiptId = receiptData?.receiptId;
+  const [currency, setCurrency] = useState("");
+
   useEffect(() => {
-    const handle = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handle);
-    return () => window.removeEventListener("resize", handle);
-  }, []);
+  getUserProfile()
+    .then((data) => {
+      const user = data?.user ?? data;
+      setCurrency(user?.currency || "");
+    })
+    .catch(() => {});
+}, []);
 
 
   if (!receiptData) {
@@ -60,6 +70,8 @@ const receiptId = receiptData?.receiptId;
   }
   
   const items = receiptData.items || [];
+  const money = (value) =>
+  currency ? formatMoney(value, currency, 2) : Number(value ?? 0).toFixed(2);
   
   const visibleItems = showAllItems
     ? items
@@ -332,18 +344,21 @@ const handleDelete = async () => {
                 fontSize: isMobile ? 36 : 48,
                 fontWeight: 700, color: "#004C22", lineHeight: "1.2",
               }}>
-                {receiptData.totalAmount}
+                {money(receiptData.totalAmount ?? receiptData.total)}
               </p>
             </div>
 
             {/* Eco Score */}
             <div>
-              <p style={{
-                margin: "0 0 8px", fontSize: 12, fontWeight: 500,
-                color: "#404940", textTransform: "uppercase", letterSpacing: 0.6,
-              }}>
-                ECO-SCORE
-              </p>
+               <div style={{ display: "flex", alignItems: "center", margin: "0 0 8px" }}>
+                <span style={{
+                  fontSize: 12, fontWeight: 500, color: "#404940",
+                  textTransform: "uppercase", letterSpacing: 0.6,
+                }}>
+                  ECO-SCORE
+                </span>
+                <EcoScoreInfo />
+              </div>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 <svg width={64} height={64}>
                   <circle cx={32} cy={32} r={radius} fill="none" stroke="#E6E8EA" strokeWidth={6} />
@@ -363,7 +378,8 @@ const handleDelete = async () => {
                     fontSize: 12, fontWeight: 500, padding: "3px 8px",
                     borderRadius: 4, marginBottom: 6,
                   }}>
-                    {receiptData.ecoLabel}
+                  {receiptData.ecoLabel ||
+                   (safeEcoScore >= 80 ? "Very sustainable" : safeEcoScore >= 50 ? "Fair" : "Low impact")}
                   </span>
                   <p style={{ margin: 0, fontSize: 14, color: "#404940", lineHeight: "20px" }}>
                     {receiptData.sustainabilityTip}
@@ -425,7 +441,7 @@ const handleDelete = async () => {
 
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: "#191C1E" }}>
-                    {item.price}
+                    {money(item.price)}
                   </p>
                   {item.grade && (
                     <p style={{ margin: 0, fontSize: 12, fontWeight: 500, color: getImpactColor(item.grade) }}>

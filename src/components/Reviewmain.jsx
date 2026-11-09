@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import AIicon from "../assets/AI-iconGreen.svg";
 import { confirmReceipt, createCategory, getCategories } from "../api";
+import { EcoScoreInfo } from "../components/InfoTip";
 
 const CATEGORY_OPTIONS = [
   "Groceries", "Food & Dining", "Transport", "Utilities",
@@ -12,6 +13,7 @@ const CATEGORY_OPTIONS = [
 ];
 
 const EMPTY_ITEM = { name: "", price: "", category: "Groceries" };
+const NEW_CATEGORY = "__new_category__";
 
 export default function ReviewReceipt() {
   const navigate = useNavigate();
@@ -141,6 +143,13 @@ export default function ReviewReceipt() {
  const [isSavingCategory, setIsSavingCategory] = useState(false);
  const [userCategories, setUserCategories] = useState(CATEGORY_OPTIONS);
  const [activeItemIndex, setActiveItemIndex] = useState(null);
+ const categoryOptions = Array.from(
+  new Set([
+    ...userCategories,
+    "Other",
+    ...items.map((item) => item.category).filter(Boolean),
+  ])
+);
  useEffect(() => {
   const loadCategories = async () => {
     try {
@@ -174,7 +183,7 @@ export default function ReviewReceipt() {
   setItems(updated);
 };
 const handleCategoryChange = (index, value) => {
-  if (value === "Other") {
+  if (value === NEW_CATEGORY) {
     setActiveItemIndex(index);
     setNewCategory("");
     setShowCategoryPopup(true);
@@ -183,6 +192,7 @@ const handleCategoryChange = (index, value) => {
 
   handleItemChange(index, "category", value);
 };
+
 const saveCustomCategory = async () => {
   const categoryName = newCategory.trim();
 
@@ -228,6 +238,7 @@ const handleConfirm = async () => {
   try {
     const receiptData = {
       storeName,
+      store: storeName,
       date,
       total: Math.round(Number(total) * 100) / 100,
       category: items[0]?.category || "Other",
@@ -299,7 +310,9 @@ const handleConfirm = async () => {
         background: "#F2F4F6", borderRadius: 12,
         padding: 16, marginBottom: 20,
       }}>
-        <h3 style={{ margin: 0 }}>Sustainability Score</h3>
+                <h3 style={{ margin: 0, display: "flex", alignItems: "center" }}>
+          Sustainability Score <EcoScoreInfo />
+        </h3>
         <p style={{ fontSize: 30, fontWeight: 700, color: "#006E2F", margin: "10px 0" }}>
           {sustainabilityScore}/10
         </p>
@@ -454,20 +467,9 @@ const handleConfirm = async () => {
                       outline: "none", background: "white",
                     }}
                   />
-                  <select
+        <select
   value={item.category}
-  onChange={(e) => {
-    const value = e.target.value;
-
-    if (value === "Other") {
-      setActiveItemIndex(index);
-      setNewCategory("");
-      setShowCategoryPopup(true);
-      return;
-    }
-
-    handleItemChange(index, "category", value);
-  }}
+  onChange={(e) => handleCategoryChange(index, e.target.value)}
   style={{
     padding: "10px 14px",
     borderRadius: 8,
@@ -479,13 +481,13 @@ const handleConfirm = async () => {
     cursor: "pointer",
   }}
 >
-{userCategories.map((cat) => (
-  <option key={cat} value={cat}>
-    {cat}
-  </option>
-))}
-</select>
-                </div>
+  {categoryOptions.map((cat) => (
+    <option key={cat} value={cat}>
+      {cat}
+    </option>
+  ))}
+  <option value={NEW_CATEGORY}>+ Create new category</option>
+</select>  </div>
               ))}
             </div>
 
