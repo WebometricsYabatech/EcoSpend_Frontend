@@ -154,13 +154,17 @@ export async function scanReceipt(file) {
 
 export async function confirmReceipt(receiptData) {
   const token = localStorage.getItem("token");
+  const body = {
+    ...receiptData,
+    store: receiptData.store || receiptData.storeName,
+  };
   const response = await fetch(`${BASE_URL}/api/ai/confirm-receipt`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
     },
-    body: JSON.stringify(receiptData),
+    body: JSON.stringify(body),
   });
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to confirm receipt.");
@@ -289,7 +293,7 @@ export async function changePassword(newPassword) {
 // ── USER ──
 export async function getUserProfile() {
   const token = localStorage.getItem("token");
-  const response = await fetch(`${BASE_URL}/api/profile`, {
+  const response = await fetch(`${BASE_URL}/api/user/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await response.json();
@@ -327,11 +331,15 @@ export async function uploadAvatar(file) {
 }
 
 // ── TRANSACTIONS ──
-export async function getTransactions() {
+export async function getTransactions(params = {}) {
   const token = localStorage.getItem("token");
-  const response = await fetch(`${BASE_URL}/api/transactions`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const query = new URLSearchParams(
+    Object.entries(params).filter(([, v]) => v !== undefined && v !== "")
+  ).toString();
+  const response = await fetch(
+    `${BASE_URL}/api/transactions${query ? `?${query}` : ""}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || "Failed to fetch transactions.");
   return data;
@@ -361,14 +369,17 @@ export async function updateTransaction(id, transactionData) {
   if (!response.ok) throw new Error(data.message || "Failed to update transaction.");
   return data;
 }
-export async function getReceiptHistory() {
+export async function getReceiptHistory(page = 1, limit = 10) {
   const token = localStorage.getItem("token");
 
-  const response = await fetch(`${BASE_URL}/api/receipts/history`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    `${BASE_URL}/api/receipts/history?page=${page}&limit=${limit}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   const data = await response.json();
 
@@ -413,7 +424,7 @@ export async function updateCategory(id, category) {
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      category,
+      name: category,
     }),
   });
 
