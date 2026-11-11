@@ -10,17 +10,23 @@ import {
 import { FiAlertTriangle, FiCheckCircle } from "react-icons/fi";
 import { getDashboard } from "../api";
 import { formatCurrency } from "../utils/currency";
+
+
 // ── CATEGORY STYLES ──
 const CATEGORY_STYLES = {
   FOOD: { bg: "#6BFF8F", color: "#007432" },
+  "FOOD & DINING": { bg: "#6BFF8F", color: "#007432" },
+  GROCERIES: { bg: "#DCFCE7", color: "#166534" },
   ELECTRONICS: { bg: "#FFDAD6", color: "#93000A" },
   TRANSPORT: { bg: "#FEF3C7", color: "#92400E" },
+  UTILITIES: { bg: "#E0F2FE", color: "#075985" },
   CLOTHING: { bg: "#F3E8FF", color: "#6B21A8" },
+  SHOPPING: { bg: "#F3E8FF", color: "#6B21A8" },
+  HEALTH: { bg: "#DBEAFE", color: "#1E40AF" },
   HEALTHCARE: { bg: "#DBEAFE", color: "#1E40AF" },
   ENTERTAINMENT: { bg: "#CCFBF1", color: "#0F766E" },
   OTHER: { bg: "#E6E8EA", color: "#404940" },
 };
-
 const IMPACT_STYLES = {
   High: { color: "#006E2F" },
   Med: { color: "#D97706" },
@@ -167,6 +173,7 @@ export default function DashboardMain() {
       });
   }, []);
 
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -207,6 +214,11 @@ export default function DashboardMain() {
   const lastMonth = overview.totalLastMonth ?? 0;
   const monthChange = overview.monthChange ?? 0;
   const budgetUsed = overview.percentageUsed ?? 0;
+  const receiptCount =
+  overview.receiptScans ??
+  overview.receiptCount ??
+  overview.totalReceipts ??
+  recentReceipts.length;
   const isOverBudget = overview.isOverBudget ?? false;
   
   // If no data at all, show empty state
